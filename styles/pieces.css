@@ -1,0 +1,51 @@
+/*Peças claras*/
+
+.white-rook {
+    content: url(../img/white_rook.png);
+}
+
+.white-horse {
+    content: url(../img/white_horse.png);
+}
+
+.white-bishop {
+    content: url(../img/white_bishop.png);
+}
+
+.white-queen {
+    content: url(../img/white_queen.png);
+}
+
+.white-king {
+    content: url(../img/white_king.png);
+}
+
+.white-pawn {
+    content: url(../img/white_pawn.png);
+}
+
+/*Peças escuras*/
+
+.dark-rook {
+    content: url(../img/dark_rook.png);
+}
+
+.dark-horse {
+    content: url(../img/dark_horse.png);
+}
+
+.dark-bishop {
+    content: url(../img/dark_bishop.png);
+}
+
+.dark-queen {
+    content: url(../img/dark_queen.png);
+}
+
+.dark-king {
+    content: url(../img/dark_king.png);
+}
+
+.dark-pawn {
+    content: url(../img/dark_pawn.png);
+}
