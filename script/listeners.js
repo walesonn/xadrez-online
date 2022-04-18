@@ -80,3 +80,9 @@ function onMouseDown(e) {
         ];
     }
 }
+
+function addListeners() {
+    document.addEventListener("mousedown", onMouseDown);
+    document.addEventListener("mousemove", onMouseMove, true);
+    document.addEventListener("mouseup", onMouseUp, true);
+}
