@@ -39,26 +39,46 @@ class Pawn extends ChessPiece {
         this.startPosition = startPosition;
     }
 
-    /*Essa função calcula aonde essa peça pode andar de acordo com sua posição atual*/
-    /*Obs: a função só leva em conta aonde a peça poderia andar, não verificando se há
-    peças no caminho bloqueando o movimento*/
+    /*Função que calcula onde esta peça pode andar de acordo com sua posição atual*/
     whereCanWalk(currentPosition) {
+        let currentPositionInCoord = BoardCoord.toCoord(currentPosition);
+
         /*Se o peão estiver na posição inicial, no seu próximo
         movimento, ele pode pular uma casa*/
         if (currentPosition == this.startPosition) {
-            return [currentPosition - 8, currentPosition - 16];
+            return [
+                currentPositionInCoord.goUp(1),
+                currentPositionInCoord.goUp(2)
+            ];
         } else {
-            return (currentPosition - 8 <= 64 && currentPosition - 8 >= 0) 
-                ? [currentPosition - 8] 
-                : [];
+            /*Se o movimento pra cima for parar em um quadrado de id >= 1
+            e se não houver peças naquele quadrado*/
+            return (currentPositionInCoord.goUp(1) >= 1
+                    && boardMap.get(currentPositionInCoord.goUp(1)) == null) 
+                        ? [currentPositionInCoord.goUp(1)] 
+                        : [];
         }
+    }
 
-        /*
-        peão pode se mover e comer uma peça quando:
+    /*Função que calcula onde esta peça pode atacar de acordo com sua posição atual*/
+    whereCanAttack(currentPosition) {
+        let currentPositionInCoord = BoardCoord.toCoord(currentPosition);
+        let canAttackPositions = [];
 
-        // olhando as diagonais do peão
-        if ()
-        */
+        let rightDiagonal = parseInt(currentPositionInCoord.walk(1, 1));
+        let leftDiagonal = parseInt(currentPositionInCoord.walk(-1, 1));
+        let rightDiagonalPiece = boardMap.get(rightDiagonal);
+        let leftDiagonalPiece = boardMap.get(leftDiagonal);
+
+        /*Se houver peça na diagonal direita do peão e ela for inimiga*/
+        if (rightDiagonalPiece != null && rightDiagonalPiece.pieceColor != playerColor)
+            canAttackPositions.push(rightDiagonal);
+        
+        /*Se houver peça na diagonal esquerda do peão e ela for inimiga*/
+        if (leftDiagonalPiece != null && leftDiagonalPiece.pieceColor != playerColor)
+            canAttackPositions.push(leftDiagonal);
+
+        return canAttackPositions;
     }
 }
 

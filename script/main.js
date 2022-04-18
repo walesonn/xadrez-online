@@ -12,6 +12,7 @@ let firstSelection = false;
 let selectedPiecePosition; /*int*/
 let pieceObj; /*ChessPiece*/
 let whereCanWalk; /*array*/
+let whereCanAttack; /*array*/
 
 function createBoard() {
     let column = 0;
@@ -122,7 +123,7 @@ function createRules() {
             peça selecionada, deseleciona-la*/
             if (this.firstChild && selectedPiece) {
                 selectedPiece = null;
-                unpaintSquares(whereCanWalk);
+                unpaintSquares();
             }
 
             /*Se o jogador clicou em outro quadrado já estando com uma peça

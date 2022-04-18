@@ -45,7 +45,7 @@ function onMouseUp(e) {
         e se este quadrado não for o mesmo que a peça estava*/
         if (mousePosition.x >= rect.x && mousePosition.x <= rect.x + rect.width
             && mousePosition.y >= rect.y && mousePosition.y <= rect.y + rect.height
-            && square.id != movingFrom.id
+            && movingFrom && square.id != movingFrom.id
         ) {
             /*Então esse é o novo quadrado que o mouse está encima*/
             squareOver = square;
@@ -53,6 +53,8 @@ function onMouseUp(e) {
     });
 
     if (squareOver) secondSelectionCall(squareOver, true);
+    
+    if (!piece) return;
     
     piece.style.position = "static";
     piece.style.left = "auto";
