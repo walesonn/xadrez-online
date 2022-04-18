@@ -1,12 +1,12 @@
-function paintSquares(walkPositions, attackPositions) {
-    walkPositions.forEach(position => {
+function paintSquares(possibleMoves) {
+    possibleMoves.walkPositions.forEach(position => {
         let currentSquare = document.querySelector(`#square${position}`);
         
         currentSquare.style.filter = "grayscale(100%) brightness(80%) sepia(300%) hue-rotate(50deg) saturate(500%) drop-shadow(0 0 0.75rem green)";
         currentSquare.style.border = "1px #000706 solid";
     });
 
-    attackPositions.forEach(position => {
+    possibleMoves.attackPositions.forEach(position => {
         let currentSquare = document.querySelector(`#square${position}`);
         
         /*Se nesta posição houver uma peça e ela for da cor do adversário*/
@@ -22,13 +22,18 @@ function paintSquares(walkPositions, attackPositions) {
 }
 
 function unpaintSquares() {
-    whereCanWalk.concat(whereCanAttack).forEach(position => {
-        document.querySelector(`#square${position}`)
-            .style.filter = "";
-
-        document.querySelector(`#square${position}`)
-            .style.border = "";
+    possibleMoves.walkPositions.forEach(position => {
+        clearFilterAndBorder(document.querySelector(`#square${position}`));
     });
+
+    possibleMoves.attackPositions.forEach(position => {
+        clearFilterAndBorder(document.querySelector(`#square${position}`));
+    });
+}
+
+function clearFilterAndBorder(element) {
+    element.style.filter = "";
+    element.style.border = "";
 }
 
 /*Função chamada quando uma peça é selecionada*/
@@ -45,11 +50,10 @@ function firstSelectionCall(context) {
 
     /*Pega um array com as posições que essa peça pode andar
     Obs: não leva em conta obstáculos no caminho*/
-    whereCanWalk = pieceObj.whereCanWalk(selectedPiecePosition);
-    whereCanAttack = pieceObj.whereCanAttack(selectedPiecePosition);
+    possibleMoves = pieceObj.getPossibleMoves(selectedPiecePosition);
 
     /*Pinta os quadrados em que a peça pode se mover*/
-    paintSquares(whereCanWalk, whereCanAttack);
+    paintSquares(possibleMoves);
 
     firstSelection = true;
 }
@@ -61,19 +65,21 @@ function secondSelectionCall(square, invokedByDragAndDrop = false) {
     let positionClicked = parseInt(square.id.replace("square", ""));
 
     /*Se ele pode andar para aquela posição*/
-    if (whereCanWalk && whereCanWalk.includes(positionClicked)) {
-        /*Se não houver peças naquela posição*/
-        if (boardMap.get(positionClicked) == null) {
-            
-            // TODO: se houver peças inimigas e o player mover até elas, tirar elas do tabuleiro
-            // Despintar as partes que não se pode andar
-            
-            boardMap.set(selectedPiecePosition, null);
-            boardMap.set(positionClicked, pieceObj);
-            pieceObj.moveTo(positionClicked);
-    
-            unpaintSquares();
-        }
+    if (possibleMoves.walkPositions.length > 0 
+        && (possibleMoves.walkPositions.includes(positionClicked)
+        || possibleMoves.attackPositions.includes(positionClicked))
+    ) {
+        /*Setar a posição a qual a peça selecionada está saindo para null*/
+        boardMap.set(selectedPiecePosition, null);
+
+        /*Mover a peça até a posição clicada*/
+        pieceObj.moveTo(positionClicked, pieceObj);
+
+        /*Caso na nova posição tenha uma uma peça inimiga e ela estiver
+        no array de possíveis jogadas de ataque, tirar ela do tabuleiro*/
+        if (possibleMoves.attackPositions.includes(positionClicked))
+
+        unpaintSquares();
     }
 
     /*Se essa função não foi invocada após um drag and drop

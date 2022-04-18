@@ -50,10 +50,8 @@ class Coord {
 
 class BoardCoord {
 
-    /*
-    O "x" representa a coluna e o "y" a linha do quadrado
-    começando pelo topo (ou seja, "y" é maior conforme desce)
-    */
+    /*O "x" representa a coluna e o "y" a linha do quadrado
+    começando pelo topo (ou seja, "y" é maior conforme desce)*/
     static toCoord(num) {
         if (num < 1 || num > 64) 
             throw new Error(num + " não é um número válido! Precisa estar entre 1 e 64");

@@ -11,8 +11,7 @@ let selectedPiece = null;
 let firstSelection = false;
 let selectedPiecePosition; /*int*/
 let pieceObj; /*ChessPiece*/
-let whereCanWalk; /*array*/
-let whereCanAttack; /*array*/
+let possibleMoves; /*PossibleMoves*/
 
 function createBoard() {
     let column = 0;
