@@ -39,6 +39,10 @@ body {
     transform: translate(-50%, -50%) rotateX(180deg);
 }
 
+.chess-piece.rotated {
+    transform: rotateX(180deg);
+}
+
 .square {
     display: flex;
     align-items: center;
@@ -49,14 +53,22 @@ body {
 }
 
 .square img {
-    height: 80%;
-    width: 80%;
+    user-select: none;
+
+    position: static;
+    top: auto;
+    left: auto;
+
+    z-index: 1000;
+
+    height: 60px;
+    width: 60px;
 }
 
-.black {
+.square.black {
     background: var(--darker-square);
 }
 
-.white {
+.square.white {
     background: var(--lighter-square);
 }
