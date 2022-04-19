@@ -55,14 +55,26 @@ class ChessPiece {
     }
 
     leaveBoard() {
+        let position = parseInt(
+            this.parentNode.id.replace("square", "")
+        );
+
+        let piece = boardMap.get(position)
+
+        /*Se a peça for um rei*/
+        if (piece.constructor
+            .name.toLowerCase() == PieceType.King
+        ) {
+            let winningColor = piece.pieceColor == PieceColor.White 
+                ? PieceColor.Dark : PieceColor.White
+            
+            endGame(winningColor);
+        }
+
         const pieceImg = this.parentNode.firstChild;
 
         /*Remove a peça da posição atual*/
         this.parentNode.removeChild(pieceImg);
-
-        let position = parseInt(
-            this.parentNode.id.replace("square", "")
-        );
 
         /*Setando o valor da posição antiga como nula (sem peça)*/
         boardMap.set(position, null);

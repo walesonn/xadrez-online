@@ -192,6 +192,11 @@ function setup() {
     addListeners();
 }
 
+function endGame(winningColor) {
+    /*TODO: Anunciar o vencedor*/
+    /*alert("Winner: " + winningColor);*/
+}
+
 function run() {
     /*Cria e exibe o tabuleiro de xadrez na página*/
     createBoard();
