@@ -24,6 +24,7 @@ function onMouseMove(e) {
 }
 
 function onMouseUp(e) {
+    if (!isDown) return;
     isDown = false;
 
     let squareOver;
@@ -47,13 +48,14 @@ function onMouseUp(e) {
             && mousePosition.y >= rect.y && mousePosition.y <= rect.y + rect.height
             && movingFrom && square.id != movingFrom.id
         ) {
-            /*Então esse é o novo quadrado que o mouse está encima*/
+            /*Então esse é o novo quadrado que a peça está encima*/
             squareOver = square;
         }
     });
 
-    if (squareOver) secondSelectionCall(squareOver, true);
-    
+    if (squareOver)
+        secondSelectionCall(squareOver, true);
+ 
     if (!piece) return;
     
     piece.style.position = "static";

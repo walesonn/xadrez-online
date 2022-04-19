@@ -1,14 +1,16 @@
-const body = document.getElementsByTagName("body")[0];
+/*Determina a cor de peça do jogador*/
+const playerColor = PieceColor.Dark;
+
 const boardMap = new Map();
 
+const body = document.getElementsByTagName("body")[0];
 const board = document.querySelector("#board");
-let isBoardRotated; /*boolean*/
 
-const playerColor = PieceColor.Dark;
+let isBoardRotated; /*boolean*/
 
 /*Variáveis usadas na função createRules()*/
 let selectedPiece = null;
-let firstSelection = false;
+let firstSelection = true;
 let selectedPiecePosition; /*int*/
 let pieceObj; /*ChessPiece*/
 let possibleMoves; /*PossibleMoves*/
@@ -118,16 +120,20 @@ function createRules() {
     
     squares.forEach(square => {
         square.addEventListener("mousedown", function(event) {
-            /*Se o jogador clicou em outro quadrado já estando com uma
-            peça selecionada, deseleciona-la*/
-            if (this.firstChild && selectedPiece) {
+            /*Se o jogador clicou em outra peça da mesma cor já 
+            estando com uma peça selecionada, deseleciona-la*/
+            if (this.firstChild 
+                && this.firstChild.classList.contains(playerColor) 
+                && selectedPiece
+            ) {
                 selectedPiece = null;
                 unpaintSquares();
             }
 
             /*Se o jogador clicou em outro quadrado já estando com uma peça
             selecionada, essa não é a primeira seleção dele*/
-            if (selectedPiece) firstSelection = false;
+            if (selectedPiece) 
+                firstSelection = false;
 
             /*Quando o jogador selecionar uma casa que contenha uma peça*/
             /*&& Se não houver peça selecionada*/
