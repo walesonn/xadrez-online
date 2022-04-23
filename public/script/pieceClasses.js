@@ -901,3 +901,15 @@ class King extends ChessPiece {
         return possibleMoves;
     }
 }
+
+// module.exports = {
+//     PieceColor: PieceColor,
+//     PieceType: PieceType,
+//     PossibleMoves: PossibleMoves,
+//     Pawn: Pawn,
+//     Rook: Rook,
+//     Horse: Horse,
+//     Bishop: Bishop,
+//     Queen: Queen,
+//     King: King
+// }
