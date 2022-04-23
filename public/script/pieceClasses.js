@@ -28,7 +28,7 @@ class ChessPiece {
         this.parentNode = parentNode;
     }
 
-    moveTo(newPosition) {
+    moveTo(newPosition, isEnemyMovement = false) {
         let newPositionPiece = boardMap.get(newPosition);
 
         if (newPositionPiece != null)
@@ -52,6 +52,26 @@ class ChessPiece {
 
         /*Passando a nova posição da peça para o boardMap*/
         boardMap.set(newPosition, this);
+
+        let oldPositionCoord = BoardCoord.toCoord(oldPosition); 
+        let newPositionCoord = BoardCoord.toCoord(newPosition);
+
+        if (isEnemyMovement) return;
+        
+        /*Espelhando o movimento para mandar para o adversário*/
+        const mirroredOldPosition = new Coord(oldPositionCoord.x, (8 - oldPositionCoord.y) + 1);
+        
+        const yOffset = (oldPositionCoord.y - newPositionCoord.y);
+        const mirroredNewPosition = new Coord(newPositionCoord.x, mirroredOldPosition.y + yOffset);
+
+        const mirroredPositions = JSON.stringify(
+            { 
+                oldPosition: mirroredOldPosition.toNumber(), 
+                newPosition: mirroredNewPosition.toNumber()
+            }
+        );
+
+        sendMovementToServer(mirroredPositions);
     }
 
     leaveBoard() {
@@ -62,9 +82,7 @@ class ChessPiece {
         let piece = boardMap.get(position)
 
         /*Se a peça for um rei*/
-        if (piece.constructor
-            .name.toLowerCase() == PieceType.King
-        ) {
+        if (piece.constructor.name.toLowerCase() == PieceType.King) {
             let winningColor = piece.pieceColor == PieceColor.White 
                 ? PieceColor.Dark : PieceColor.White
             
@@ -901,15 +919,3 @@ class King extends ChessPiece {
         return possibleMoves;
     }
 }
-
-// module.exports = {
-//     PieceColor: PieceColor,
-//     PieceType: PieceType,
-//     PossibleMoves: PossibleMoves,
-//     Pawn: Pawn,
-//     Rook: Rook,
-//     Horse: Horse,
-//     Bishop: Bishop,
-//     Queen: Queen,
-//     King: King
-// }

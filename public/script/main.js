@@ -5,11 +5,13 @@ const boardMap = new Map();
 
 const body = document.getElementsByTagName("body")[0];
 const board = document.querySelector("#board");
+const messageBox = document.querySelector("#message");
 
-let isBoardRotated; /*boolean*/
+let isBoardRotated = false;
+let isKingInCheck = false;
 
 /*Variáveis usadas na função createRules()*/
-let selectedPiece = null;
+let selectedPiece = null; /*HTML node | null*/
 let firstSelection = true;
 let selectedPiecePosition; /*int*/
 let pieceObj; /*ChessPiece*/
@@ -27,7 +29,7 @@ function createBoard() {
         /*Se a booleana "black" for verdade, o square ganha uma classe 
         chamada "black", caso contrário, chamada "white", em seguida, 
         a variável "black" tem seu valor invertido*/
-        black 
+        black
             ? square.classList.add("square", "black")
             : square.classList.add("square", "white");
     

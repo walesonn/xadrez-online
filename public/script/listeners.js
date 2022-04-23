@@ -62,6 +62,9 @@ function onMouseUp(e) {
     piece.style.left = "auto";
     piece.style.top = "auto";
     piece.style.zIndex = 1000;
+    
+    piece.style.height = "60px";
+    piece.style.width = "60px";
 }
 
 function onMouseDown(e) {
@@ -75,6 +78,9 @@ function onMouseDown(e) {
         piece = e.target;
         piece.style.position = "absolute";
         piece.style.zIndex = 1001;
+        
+        piece.style.height = "70px";
+        piece.style.width = "70px";
 
         movingFrom = e.target.parentNode;
 

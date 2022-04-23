@@ -73,15 +73,27 @@ function secondSelectionCall(target, invokedByDragAndDrop = false) {
     
     /*Se há jogadas disponíveis e ele pode andar para aquela posição*/
     if (arrayNotEmpty && legalMoveSelected) {
-        /*Caso na nova posição tenha uma uma peça inimiga e ela estiver
-        no array de possíveis jogadas de ataque, tirar ela do tabuleiro*/
-        if (possibleMoves.attackPositions.includes(positionClicked)) {
-            let piece = boardMap.get(positionClicked);
-            // piece.parentNode.removeChild(piece);
-        }
-
         /*Mover a peça até a posição clicada*/
         pieceObj.moveTo(positionClicked);
+
+        /*Checando se o player de um check no rei inimigo*/
+        let possibleMoves = boardMap.get(positionClicked)
+            .getPossibleMoves(positionClicked);
+
+        possibleMoves.attackPositions.forEach(e => {
+            let piece = boardMap.get(e);
+            if (piece.constructor.name.toLowerCase() != PieceType.King) return;
+
+            /*TODO: Mandar mensagem pro outro jogador e rodar
+            os seguintes comandos pra ele (obs: ainda precisa proibir o movimento
+            de outras peças):
+
+            isKingInCheck = true;
+
+            messageBox.innerHTML = isInCheck;
+            messageBox.classList.toggle("hidden");
+            */
+        });
     }
 
     /*Se essa função não foi invocada após um drag and drop
@@ -98,4 +110,17 @@ function secondSelectionCall(target, invokedByDragAndDrop = false) {
         selectedPiece = null
         unpaintSquares();
     }
+}
+
+/*Função que tem o propósito de mandar a nova posição da peça movida
+pelo adversário para o servidor, que por sua vez, atualizará a posição
+na tela do outro jogador*/
+function sendMovementToServer(json) {
+    /*TODO*/
+    const obj = JSON.parse(json);
+
+    /*
+    const piece = boardMap.get(obj.oldPosition);
+    piece.moveTo(obj.newPosition, true);
+    */
 }
