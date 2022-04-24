@@ -1,4 +1,20 @@
-function paintSquares(possibleMoves) {
+import { BoardCoord } from "./boardCoord.js";
+import { socket, roomId, playerColor } from "./core.js";
+import { PieceType } from "./pieceClasses.js";
+
+import { 
+    boardMap, 
+    setSelectedPiece,
+    selectedPiece,
+    selectedPiecePosition,
+    pieceObj,
+    setPieceObj,
+    setPossibleMoves,
+    possibleMoves,
+    isKingInCheck
+} from "./core.js";
+
+export function paintSquares(possibleMoves) {
     possibleMoves.walkPositions.forEach(position => {
         let currentSquare = document.querySelector(`#square${position}`);
         
@@ -15,7 +31,7 @@ function paintSquares(possibleMoves) {
     });
 }
 
-function unpaintSquares() {
+export function unpaintSquares() {
     possibleMoves.walkPositions.forEach(position => {
         clearFilterAndBorder(document.querySelector(`#square${position}`));
     });
@@ -31,30 +47,24 @@ function clearFilterAndBorder(element) {
 }
 
 /*Função chamada quando uma peça é selecionada*/
-function firstSelectionCall(context) {
-    selectedPiece = context.firstChild;
-
-    selectedPiecePosition = parseInt(
-        selectedPiece.parentNode.id.replace("square", "")
-    );
+export function firstSelectionCall(context) {
+    setSelectedPiece(context.firstChild);
 
     /*De acordo com a posição da peça selecionada, pegar a 
     instância dela no Map "boardMap"*/
-    pieceObj = boardMap.get(selectedPiecePosition);
+    setPieceObj(boardMap.get(selectedPiecePosition));
 
     /*Pega um array com as posições que essa peça pode andar
     Obs: não leva em conta obstáculos no caminho*/
-    possibleMoves = pieceObj.getPossibleMoves(selectedPiecePosition);
+    setPossibleMoves(pieceObj.getPossibleMoves(selectedPiecePosition));
 
     /*Pinta os quadrados em que a peça pode se mover*/
     paintSquares(possibleMoves);
-
-    firstSelection = true;
 }
 
 /*Função chamada quando o player clica em um novo quadrado estando
 com uma peça selecionada*/
-function secondSelectionCall(target, invokedByDragAndDrop = false) {
+export function secondSelectionCall(target, invokedByDragAndDrop = false) {
     let positionClicked;
     
     /*Pega a posição selecionada (de maneiras diferentes caso a seleção
@@ -107,27 +117,23 @@ function secondSelectionCall(target, invokedByDragAndDrop = false) {
     ) {
         firstSelectionCall(target);
     } else {
-        selectedPiece = null
+        setSelectedPiece(null)
         unpaintSquares();
     }
 }
 
 /*Função que manda a jogada espelhada para o outro jogador, atualizando
 a mesa do modo correto*/
-function mirrorPlayToServer(oldPosition, newPosition) {
+export function mirrorPlayToServer(oldPosition, newPosition) {
     let oldPositionCoord = BoardCoord.toCoord(oldPosition); 
     let newPositionCoord = BoardCoord.toCoord(newPosition);
 
-    /*Espelhando o movimento para mandar para o adversário*/
-    const mirroredOldPosition = new Coord(oldPositionCoord.x, (8 - oldPositionCoord.y) + 1);
-
-    const yOffset = (oldPositionCoord.y - newPositionCoord.y);
-    const mirroredNewPosition = new Coord(newPositionCoord.x, mirroredOldPosition.y + yOffset);
+    const mirrorPlay = BoardCoord.mirrorPlay(oldPositionCoord, newPositionCoord);
 
     socket.emit(
         'opponentPieceMoved',
         roomId,
-        mirroredOldPosition.toNumber(),
-        mirroredNewPosition.toNumber()
+        mirrorPlay.oldPosition,
+        mirrorPlay.newPosition
     );
 }

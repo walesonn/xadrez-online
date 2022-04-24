@@ -57,4 +57,26 @@ class BoardCoord {
         
         return new Coord(x, y);
     }
+
+    /*Espelha o movimento no tabuleiro*/
+    static mirrorPlay(oldPositionCoord, newPositionCoord) {
+        const mirroredOldPosition = new Coord(
+            oldPositionCoord.x, 
+            (8 - oldPositionCoord.y) + 1
+        );
+
+        const yOffset = (oldPositionCoord.y - newPositionCoord.y);
+        
+        const mirroredNewPosition = new Coord(
+            newPositionCoord.x, 
+            mirroredOldPosition.y + yOffset
+        );
+
+        return { 
+            oldPosition: mirroredOldPosition.toNumber(), 
+            newPosition: mirroredNewPosition.toNumber()
+        }
+    }
 }
+
+export { Coord, BoardCoord }

@@ -1,9 +1,22 @@
-const socket = io();
+export const socket = io();
+
+export const roomId = document.location.href.split('/')[3];
+
+import addMouseListeners from "./mouse-listeners.js";
+import { PieceColor, PieceType } from "./pieceClasses.js";
+import { Pawn, Rook, Horse, Bishop, Queen, King } from "./pieceClasses.js";
+
+import { 
+    firstSelectionCall, 
+    secondSelectionCall, 
+    paintSquares, 
+    unpaintSquares 
+} from "./handlers.js";
 
 let boardMap = new Map();
 
 /*Cor da peça do jogador*/
-let playerColor = null;
+export let playerColor = null;
 
 const body = document.getElementsByTagName("body")[0];
 const board = document.querySelector("#board");
@@ -13,11 +26,35 @@ let isBoardRotated = false;
 let isKingInCheck = false;
 
 /*Variáveis usadas na função createRules()*/
-let selectedPiece = null; /*HTML node | null*/
 let firstSelection = true;
+export let selectedPiece = null; /*HTML node | null*/
 let selectedPiecePosition; /*int*/
 let pieceObj; /*ChessPiece*/
 let possibleMoves; /*PossibleMoves*/
+
+export {
+    boardMap, isKingInCheck, setSelectedPiece, selectedPiecePosition,
+    pieceObj, setPieceObj, possibleMoves, setPossibleMoves, endGame
+}
+
+function setSelectedPiece(node) {
+    selectedPiece = node;
+    firstSelection = true;
+
+    if (!selectedPiece) return;
+
+    selectedPiecePosition = parseInt(
+        selectedPiece.parentNode.id.replace("square", "")
+    );
+}
+
+function setPieceObj(chessPiece) {
+    pieceObj = chessPiece;
+}
+
+function setPossibleMoves(moves) {
+    possibleMoves = moves;
+}
 
 function clearBoard() {
     boardMap = new Map();
@@ -210,7 +247,7 @@ function setup(playerColor) {
     fillBoardMap();
 
     /*Adiciona listeners para as peças*/
-    addListeners();
+    addMouseListeners(document, playerColor, isBoardRotated, secondSelectionCall);
 }
 
 function endGame(winningColor) {
@@ -234,8 +271,6 @@ function startGame(playerColor) {
     /*Seta configurações iniciais*/
     setup(playerColor);
 }
-
-const roomId = document.location.href.split('/')[3];
 
 socket.on('connect', () => {
     socket.emit('enteredRoom', socket.id, roomId);

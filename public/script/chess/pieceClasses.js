@@ -1,9 +1,13 @@
-const PieceColor = { 
+import { boardMap, playerColor, endGame } from "./core.js";
+import { BoardCoord } from "./boardCoord.js";
+import { mirrorPlayToServer } from "./handlers.js";
+
+export const PieceColor = { 
     White: "white", 
     Dark: "dark" 
 };
 
-const PieceType = { 
+export const PieceType = { 
     Rook: "rook",
     Horse: "horse",
     Bishop: "bishop",
@@ -900,3 +904,5 @@ class King extends ChessPiece {
         return possibleMoves;
     }
 }
+
+export { Pawn, Rook, Horse, Bishop, Queen, King }
