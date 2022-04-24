@@ -1,24 +1,19 @@
-const crypto = require("crypto");
-
-const express = require("express");
-const path = require("path");
+import crypto from 'crypto';
+import express from 'express';
+import http from 'http';
+import { Server } from 'socket.io';
 
 const app = express();
-const http = require('http');
 const server = http.createServer(app);
-
-/*Socket.IO*/
-const { Server } = require('socket.io');
 const io = new Server(server);
 
 const host = 'localhost';
 const port = 3000;
 
-const publicPath = path.join(__dirname, 'public');
-app.use(express.static(publicPath));
+app.use(express.static('public'));
 
 app.get("/", (req, res) => {
-    res.sendFile(path.join(publicPath, 'main.html'));
+    res.sendFile('main.html', { root: 'public' });
 });
 
 function createRoom() {
@@ -57,7 +52,7 @@ io.on('connection', socket => {
         const roomId = crypto.randomBytes(15).toString('hex');
         
         app.get(`/${roomId}`, (req, res) => {
-            res.sendFile(path.join(publicPath, 'chess.html'))
+            res.sendFile('chess.html', { root: 'public' });
         });
 
         io.to(socketId).emit(
