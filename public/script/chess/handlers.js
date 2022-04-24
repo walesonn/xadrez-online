@@ -73,8 +73,8 @@ function secondSelectionCall(target, invokedByDragAndDrop = false) {
     
     /*Se há jogadas disponíveis e ele pode andar para aquela posição*/
     if (arrayNotEmpty && legalMoveSelected) {
-        /*Mover a peça até a posição clicada*/
-        pieceObj.moveTo(positionClicked);
+        /*Movendo a peça para o lugar clicado*/
+        pieceObj.moveTo(positionClicked)
 
         /*Checando se o player de um check no rei inimigo*/
         let possibleMoves = boardMap.get(positionClicked)
@@ -112,15 +112,22 @@ function secondSelectionCall(target, invokedByDragAndDrop = false) {
     }
 }
 
-/*Função que tem o propósito de mandar a nova posição da peça movida
-pelo adversário para o servidor, que por sua vez, atualizará a posição
-na tela do outro jogador*/
-function sendMovementToServer(json) {
-    /*TODO*/
-    const obj = JSON.parse(json);
+/*Função que manda a jogada espelhada para o outro jogador, atualizando
+a mesa do modo correto*/
+function mirrorPlayToServer(oldPosition, newPosition) {
+    let oldPositionCoord = BoardCoord.toCoord(oldPosition); 
+    let newPositionCoord = BoardCoord.toCoord(newPosition);
 
-    /*
-    const piece = boardMap.get(obj.oldPosition);
-    piece.moveTo(obj.newPosition, true);
-    */
+    /*Espelhando o movimento para mandar para o adversário*/
+    const mirroredOldPosition = new Coord(oldPositionCoord.x, (8 - oldPositionCoord.y) + 1);
+
+    const yOffset = (oldPositionCoord.y - newPositionCoord.y);
+    const mirroredNewPosition = new Coord(newPositionCoord.x, mirroredOldPosition.y + yOffset);
+
+    socket.emit(
+        'opponentPieceMoved',
+        roomId,
+        mirroredOldPosition.toNumber(),
+        mirroredNewPosition.toNumber()
+    );
 }

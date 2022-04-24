@@ -1,7 +1,9 @@
-/*Determina a cor de peça do jogador*/
-const playerColor = PieceColor.Dark;
+const socket = io();
 
-const boardMap = new Map();
+let boardMap = new Map();
+
+/*Cor da peça do jogador*/
+let playerColor = null;
 
 const body = document.getElementsByTagName("body")[0];
 const board = document.querySelector("#board");
@@ -16,6 +18,22 @@ let firstSelection = true;
 let selectedPiecePosition; /*int*/
 let pieceObj; /*ChessPiece*/
 let possibleMoves; /*PossibleMoves*/
+
+function clearBoard() {
+    boardMap = new Map();
+    isBoardRotated = false;
+    
+    let child = board.lastElementChild; 
+    
+    while (child) {
+        board.removeChild(child);
+        child = board.lastElementChild;
+    }
+
+    messageBox.innerHTML = '';
+    if (!messageBox.classList.contains('hidden'))
+        messageBox.classList.add('hidden');
+}
 
 function createBoard() {
     let column = 0;
@@ -156,7 +174,8 @@ function createRules() {
 }
 
 function rotateBoard() {
-    isBoardRotated = board.classList.toggle("rotated");
+    board.classList.add('rotated');
+    isBoardRotated = true;
     
     [...document.querySelectorAll(".chess-piece")].forEach(piece => {
         piece.classList.toggle("rotated");
@@ -178,10 +197,10 @@ function rotateBoard() {
     }
 }
 
-function setup() {
+function setup(playerColor) {
     /*Por padrão, o tabuleiro está com o lado preto virado para a pessoa
     Portanto, se o jogador for o das peças brancas, rotacionar o tabuleiro*/
-    if (playerColor === PieceColor.White) rotateBoard();
+    if (playerColor === PieceColor.White && !isBoardRotated) rotateBoard();
     else isBoardRotated = false;
 
     /*Importante: é preciso rotacionar o tabuleiro para o lado correto antes
@@ -199,7 +218,10 @@ function endGame(winningColor) {
     /*alert("Winner: " + winningColor);*/
 }
 
-function run() {
+function startGame(playerColor) {
+    /*Limpa a página*/
+    clearBoard();
+
     /*Cria e exibe o tabuleiro de xadrez na página*/
     createBoard();
 
@@ -210,7 +232,33 @@ function run() {
     createRules();
 
     /*Seta configurações iniciais*/
-    setup();
+    setup(playerColor);
 }
 
-run();
+const roomId = document.location.href.split('/')[3];
+
+socket.on('connect', () => {
+    socket.emit('enteredRoom', socket.id, roomId);
+});
+
+socket.on('startGame', room => {
+    switch (socket.id) {
+        case room.whiteId:
+            playerColor = PieceColor.White;
+            startGame(playerColor);
+            break;
+
+        case room.darkId:
+            playerColor = PieceColor.Dark;
+            startGame(playerColor);
+            break;
+    
+        default:
+            break;
+    }
+});
+
+socket.on('opponentMovePiece', (oldPosition, newPosition) => {
+    let piece = boardMap.get(oldPosition);
+    piece.moveTo(newPosition, true);
+});

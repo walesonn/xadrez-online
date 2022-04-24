@@ -28,7 +28,7 @@ class ChessPiece {
         this.parentNode = parentNode;
     }
 
-    moveTo(newPosition, isEnemyMovement = false) {
+    moveTo(newPosition, isEnemyMove = false) {
         let newPositionPiece = boardMap.get(newPosition);
 
         if (newPositionPiece != null)
@@ -46,32 +46,13 @@ class ChessPiece {
         /*Move a peça para a nova posição*/
         this.parentNode = document.querySelector(`#square${newPosition}`);
         this.parentNode.appendChild(pieceImg);
-
-        /*Setando o valor da posição antiga como nula (sem peça)*/
+        
         boardMap.set(oldPosition, null);
-
-        /*Passando a nova posição da peça para o boardMap*/
         boardMap.set(newPosition, this);
 
-        let oldPositionCoord = BoardCoord.toCoord(oldPosition); 
-        let newPositionCoord = BoardCoord.toCoord(newPosition);
+        if (isEnemyMove) return;
 
-        if (isEnemyMovement) return;
-        
-        /*Espelhando o movimento para mandar para o adversário*/
-        const mirroredOldPosition = new Coord(oldPositionCoord.x, (8 - oldPositionCoord.y) + 1);
-        
-        const yOffset = (oldPositionCoord.y - newPositionCoord.y);
-        const mirroredNewPosition = new Coord(newPositionCoord.x, mirroredOldPosition.y + yOffset);
-
-        const mirroredPositions = JSON.stringify(
-            { 
-                oldPosition: mirroredOldPosition.toNumber(), 
-                newPosition: mirroredNewPosition.toNumber()
-            }
-        );
-
-        sendMovementToServer(mirroredPositions);
+        mirrorPlayToServer(oldPosition, newPosition);
     }
 
     leaveBoard() {
