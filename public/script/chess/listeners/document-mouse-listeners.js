@@ -2,8 +2,8 @@ export default function addMouseListeners(game) {
     
     let offset = [0, 0];
     let isDown = false;
-    let movingFrom; /*HTMLDivElement*/
-    let piece; /*HTMLDivElement*/
+    let movingFrom; /* HTMLDivElement */
+    let piece; /* HTMLDivElement */
     
     function onMouseMove(e) {
         e.preventDefault();
@@ -33,21 +33,21 @@ export default function addMouseListeners(game) {
             y: e.clientY
         };
     
-        /*Iterando entre cada quadrado do tabuleiro e vendo se o mouse está
-        encima de algum deles*/
+        /* Iterando entre cada quadrado do tabuleiro e vendo se o mouse está
+        encima de algum deles */
         [...document.querySelectorAll(".square")].forEach(square => {
             let rect = square.getBoundingClientRect();
     
-            /*Se a posição X do mouse for maior que o X do canto esquerdo do quadrado
+            /* Se a posição X do mouse for maior que o X do canto esquerdo do quadrado
             e menor que o X do canto direito do quadrado
             e se a posição Y do mouse for maior que o Y do canto superior do quadrado
             e menor que o Y do canto inferior do quadrado
-            e se este quadrado não for o mesmo que a peça estava*/
+            e se este quadrado não for o mesmo que a peça estava */
             if (mousePosition.x >= rect.x && mousePosition.x <= rect.x + rect.width
                 && mousePosition.y >= rect.y && mousePosition.y <= rect.y + rect.height
                 && movingFrom && square.id != movingFrom.id
             ) {
-                /*Então esse é o novo quadrado que a peça está encima*/
+                /* Então esse é o novo quadrado que a peça está encima */
                 squareOver = square;
             }
         });
@@ -67,9 +67,9 @@ export default function addMouseListeners(game) {
     }
     
     function onMouseDown(e) {
-        /*Se o target do evento ter a classe "chess-piece" 
+        /* Se o target do evento ter a classe "chess-piece" 
         e se for uma peça que o player possa mexer (peça de sua cor)
-        e se for o seu turno*/
+        e se for o seu turno */
         if (e.target.classList.contains("chess-piece")
             && e.target.classList.contains(game.state.playerColor)
             && game.state.isMyTurn
@@ -92,7 +92,8 @@ export default function addMouseListeners(game) {
         }
     }
 
-    document.addEventListener("mousedown", onMouseDown);
-    document.addEventListener("mousemove", onMouseMove, true);
-    document.addEventListener("mouseup", onMouseUp, true);
+    /* Adicionando os listeners */
+    document.addEventListener('mousedown', onMouseDown);
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
 }

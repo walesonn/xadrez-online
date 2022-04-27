@@ -37,11 +37,11 @@
 
 #message-box-copy,
 #message-box-close {
-    background-color: var(--darker-square);
-    color: var(--lighter-square);
+    background-color: #7db5b6;
+    color: #f0f9fc;
 
-    border: 1px solid var(--background);
-    border-radius: 20px;
+    border: 1px solid #000706;
+    border-radius: 15px;
 
     padding: 12px 20px;
     
@@ -58,9 +58,17 @@
 #message-box-copy:focus,
 #message-box-close:hover,
 #message-box-close:focus {
-    color: var(--background);
-    text-decoration: none;
     cursor: pointer;
+
+    text-decoration: none;
+
+    color: white;
+    filter: brightness(108%);
+}
+
+#message-box-copy:active,
+#message-box-close:active {
+    filter: brightness(113%);
 }
 
 #message {

@@ -1,10 +1,12 @@
 export default function initializeMessageBox() {
+    
     const modal = document.getElementById('message-box-modal');
     const copyButton = document.getElementById('message-box-copy');
     const closeButton = document.getElementById('message-box-close');
     const messageDiv = document.getElementById('message');
     
     copyButton.onclick = () => {
+        /* Copiar o URL da página para a área de transferência */
         navigator.clipboard.writeText(window.location.href);
 
         modal.style.display = 'none';
@@ -15,7 +17,7 @@ export default function initializeMessageBox() {
         modal.style.display = 'none';
     }
     
-    /*When the user clicks anywhere outside of the modal, close it*/
+    /* Quando o usuário clicar em qualquer local fora do modal, fechar ele */
     window.onclick = (e) => {
         if (e.target == modal)
             modal.style.display = 'none';
@@ -43,5 +45,20 @@ export default function initializeMessageBox() {
         }
     }
 
-    return { show, clearPiecesOnClose }
+    function loadPageOnClose(href) {
+        closeButton.onclick = () => {
+            window.location.href = href;
+        }
+
+        window.onclick = (e) => {
+            if (e.target == modal)
+                window.location.href = href;
+        }
+    }
+
+    return { 
+        show, 
+        clearPiecesOnClose, 
+        loadPageOnClose 
+    }
 }

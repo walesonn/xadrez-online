@@ -29,31 +29,34 @@ class ChessPiece {
     }
 
     moveTo(newPosition, isOpponentMove = false) {
-        /*Pegando a peça (se houver) da nova posição*/
+        /* Se houver indicativos de xeque, apagar */
+        this.game.unpaintCheckIndicatives();
+
+        /* Pegando a peça (se houver) da nova posição */
         let newPositionPieceObj = this.game.state.boardMap.get(newPosition);
 
-        /*Se houver uma peça, remove-la do jogo*/
+        /* Se houver uma peça, remove-la do jogo */
         if (newPositionPieceObj != null)
             newPositionPieceObj.leaveBoard();
 
-        /*Troca a posição da peça no boardMap para a nova posição*/
+        /* Troca a posição da peça no boardMap para a nova posição */
         this.game.state.boardMap.set(this.position, null);
         this.game.state.boardMap.set(newPosition, this);
         this.position = newPosition;
 
         if (isOpponentMove)
-            /*Se o adversário tiver feito sua jogada,
-            então é sua vez*/
+            /* Se o oponente tiver feito sua
+            jogada, então é sua vez */
             this.game.state.isMyTurn = true;
         else
-            /*Passar o turno*/
+            /* Passar o turno */
             this.game.state.isMyTurn = false;
     }
 
     leaveBoard() {
         let piece = this.game.state.boardMap.get(this.position)
 
-        /*Se a peça for um rei*/
+        /* Se a peça for um rei */
         if (piece.constructor.name.toLowerCase() == PieceType.King) {
             let winningColor = piece.pieceColor == PieceColor.White 
                 ? PieceColor.Dark : PieceColor.White
@@ -62,7 +65,7 @@ class ChessPiece {
             return;
         }
 
-        /*Setando o valor da posição dessa peça como nula*/
+        /* Setando o valor da posição dessa peça como nula */
         this.game.state.boardMap.set(this.position, null);
     }
 }
@@ -73,8 +76,8 @@ class Pawn extends ChessPiece {
         this.startPosition = this.position;
     }
 
-    /*Função que calcula as possíveis jogadas de acordo com 
-    a posição atual da peça*/
+    /* Função que calcula as possíveis jogadas de acordo com 
+    a posição atual da peça */
     getPossibleMoves(currentPosition) {
         const possibleMoves = new PossibleMoves();
         let currentPositionInCoord = BoardCoord.toCoord(currentPosition);
@@ -85,24 +88,24 @@ class Pawn extends ChessPiece {
         let oneSquareUp = this.game.state.boardMap.get(oneUpNumber);
         let twoSquaresUp = this.game.state.boardMap.get(twoUpNumber);
 
-        /*Se o peão estiver na posição inicial, no seu próximo
-        movimento, ele pode pular uma casa, caso não haja obstáculos*/
+        /* Se o peão estiver na posição inicial, no seu próximo
+        movimento, ele pode pular uma casa, caso não haja obstáculos */
         if (currentPosition == this.startPosition) {
-            /*Se o quadrado de cima estiver livre*/
+            /* Se o quadrado de cima estiver livre */
             if (oneSquareUp == null)
                 possibleMoves.walkPositions.push(oneUpNumber);
             
-            /*Se os dois quadrados acima estiverem livres*/
+            /* Se os dois quadrados acima estiverem livres */
             if (oneSquareUp == null && twoSquaresUp == null)
                 possibleMoves.walkPositions.push(twoUpNumber);
         } else {
-            /*Se o movimento pra cima não for sair do tabuleiro
-            e se não houver peças naquele quadrado*/
+            /* Se o movimento pra cima não for sair do tabuleiro
+            e se não houver peças naquele quadrado */
             if (currentPositionInCoord.goUp(1).y >= 1 && oneSquareUp == null)
                 possibleMoves.walkPositions.push(oneUpNumber);
         }
 
-        /*Calculando onde esta peça pode atacar de acordo com sua posição atual*/
+        /* Calculando onde esta peça pode atacar de acordo com sua posição atual */
         let leftDiagonal = parseInt(currentPositionInCoord.go(-1, 1).toNumber());
         let rightDiagonal = parseInt(currentPositionInCoord.go(1, 1).toNumber());
         let leftDiagonalPiece = this.game.state.boardMap.get(leftDiagonal);
@@ -119,28 +122,28 @@ class Pawn extends ChessPiece {
         
         // Se as diagonais não estiverem no mesmo Y
         if (leftDiagonalCoord.y != rightDiagonalCoord.y) {
-            /*Se a diagonal da direita estiver no mesmo Y da posição desta peça*/
+            /* Se a diagonal da direita estiver no mesmo Y da posição desta peça */
             if (rightDiagonalCoord.y == currentPositionInCoord.y)
-                /*Ignorar a verificação da diagonal direita*/
+                /* Ignorar a verificação da diagonal direita */
                 ignoreRightDiagonal = true;
             
             if (leftDiagonalCoord.y == currentPositionInCoord.goUp(2).y)
-                /*Ignorar a verificação da diagonal esquerda*/
+                /* Ignorar a verificação da diagonal esquerda */
                 ignoreLeftDiagonal = true;
         }
 
-        /*Se houver peça na diagonal direita do peão e ela for inimiga*/
+        /* Se houver peça na diagonal direita do peão e ela for uma peça inimiga */
         if (!ignoreRightDiagonal
             && rightDiagonalPiece != null 
-            && rightDiagonalPiece.pieceColor != this.game.state.playerColor
+            && rightDiagonalPiece.pieceColor != this.pieceColor
         ) {
             possibleMoves.attackPositions.push(rightDiagonal);
         }
         
-        /*Se houver peça na diagonal esquerda do peão e ela for inimiga*/
+        /* Se houver peça na diagonal esquerda do peão e ela for uma peça inimiga */
         if (!ignoreLeftDiagonal
             && leftDiagonalPiece != null 
-            && leftDiagonalPiece.pieceColor != this.game.state.playerColor
+            && leftDiagonalPiece.pieceColor != this.pieceColor
         ) {
             possibleMoves.attackPositions.push(leftDiagonal);
         }
@@ -154,107 +157,107 @@ class Rook extends ChessPiece {
         super(game, pieceColor, position);
     }
 
-    /*Função que calcula as possíveis jogadas de acordo com 
-    a posição atual da peça*/
+    /* Função que calcula as possíveis jogadas de acordo com 
+    a posição atual da peça */
     getPossibleMoves(currentPosition) {
         const possibleMoves = new PossibleMoves();
         let currentPositionInCoord = BoardCoord.toCoord(currentPosition);
         let counter = 1;
 
-        /*CIMA: Loop para ver a movimentação possível*/
+        /* CIMA: Loop para ver a movimentação possível */
         while (true) {
-            /*Se Y for menor a 1, está fora do tabuleiro*/
+            /* Se Y for menor a 1, está fora do tabuleiro */
             if (currentPositionInCoord.goUp(counter).y < 1)
                 break;
             
             let oneUpPosition = currentPositionInCoord.goUp(counter).toNumber();
             let oneSquareUp = this.game.state.boardMap.get(oneUpPosition);
 
-            /*Se o quadrado de cima estiver vazio*/
+            /* Se o quadrado de cima estiver vazio */
             if (oneSquareUp == null) {
                 possibleMoves.walkPositions.push(oneUpPosition);
-            /*Se o quadrado de cima for uma peça inimiga*/
-            } else if (oneSquareUp.pieceColor != this.game.state.playerColor) {
+            /* Se o quadrado de cima for uma peça inimiga */
+            } else if (oneSquareUp.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(oneUpPosition);
-                break; /*Parar o loop pois há uma peça no caminho*/
-            /*Se o quadrado de cima for uma peça aliada*/
-            } else if (oneSquareUp.pieceColor == this.game.state.playerColor) {
-                break; /*Parar o loop pois há uma peça no caminho*/
+                break; /* Parar o loop pois há uma peça no caminho */
+            /* Se o quadrado de cima for uma peça aliada */
+            } else if (oneSquareUp.pieceColor == this.pieceColor) {
+                break; /* Parar o loop pois há uma peça no caminho */
             }
 
             counter++;
         }
 
-        counter = 1; /*Voltando para 1*/
-        /*BAIXO: Loop para ver a movimentação possível*/
+        counter = 1; /* Voltando para 1 */
+        /* BAIXO: Loop para ver a movimentação possível */
         while (true) {
-            /*Se Y for maior que 8, está fora do tabuleiro*/
+            /* Se Y for maior que 8, está fora do tabuleiro */
             if (currentPositionInCoord.goDown(counter).y > 8)
                 break;
 
             let oneDownPosition = currentPositionInCoord.goDown(counter).toNumber();
             let oneSquareDown = this.game.state.boardMap.get(oneDownPosition);
 
-            /*Se o quadrado de baixo estiver vazio*/
+            /* Se o quadrado de baixo estiver vazio */
             if (oneSquareDown == null) {
                 possibleMoves.walkPositions.push(oneDownPosition);
-            /*Se o quadrado de baixo for uma peça inimiga*/
-            } else if (oneSquareDown.pieceColor != this.game.state.playerColor) {
+            /* Se o quadrado de baixo for uma peça inimiga */
+            } else if (oneSquareDown.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(oneDownPosition);
-                break; /*Parar o loop pois há uma peça no caminho*/
-            /*Se o quadrado de baixo for uma peça aliada*/
-            } else if (oneSquareDown.pieceColor == this.game.state.playerColor) {
-                break; /*Parar o loop pois há uma peça no caminho*/
+                break; /* Parar o loop pois há uma peça no caminho */
+            /* Se o quadrado de baixo for uma peça aliada */
+            } else if (oneSquareDown.pieceColor == this.pieceColor) {
+                break; /* Parar o loop pois há uma peça no caminho */
             }
 
             counter++;
         }
 
-        counter = 1; /*Voltando para 1*/
-        /*ESQUERDA: Loop para ver a movimentação possível*/
+        counter = 1; /* Voltando para 1 */
+        /* ESQUERDA: Loop para ver a movimentação possível */
         while (true) {
-            /*Se X for menor que 1, está fora do tabuleiro*/
+            /* Se X for menor que 1, está fora do tabuleiro */
             if (currentPositionInCoord.goLeft(counter).x < 1)
                 break;
 
             let oneLeftPosition = currentPositionInCoord.goLeft(counter).toNumber();
             let oneSquareLeft = this.game.state.boardMap.get(oneLeftPosition);
 
-            /*Se o quadrado da esquerda estiver vazio*/
+            /* Se o quadrado da esquerda estiver vazio */
             if (oneSquareLeft == null) {
                 possibleMoves.walkPositions.push(oneLeftPosition);
-            /*Se o quadrado da esquerda for uma peça inimiga*/
-            } else if (oneSquareLeft.pieceColor != this.game.state.playerColor) {
+            /* Se o quadrado da esquerda for uma peça inimiga */
+            } else if (oneSquareLeft.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(oneLeftPosition);
-                break; /*Parar o loop pois há uma peça no caminho*/
-            /*Se o quadrado da esquerda for uma peça aliada*/
-            } else if (oneSquareLeft.pieceColor == this.game.state.playerColor) {
-                break; /*Parar o loop pois há uma peça no caminho*/
+                break; /* Parar o loop pois há uma peça no caminho */
+            /* Se o quadrado da esquerda for uma peça aliada */
+            } else if (oneSquareLeft.pieceColor == this.pieceColor) {
+                break; /* Parar o loop pois há uma peça no caminho */
             }
 
             counter++;
         }
 
-        counter = 1; /*Voltando para 1*/
-        /*DIREITA: Loop para ver a movimentação possível*/
+        counter = 1; /* Voltando para 1 */
+        /* DIREITA: Loop para ver a movimentação possível */
         while (true) {
-            /*Se X for maior que 8, está fora do tabuleiro*/
+            /* Se X for maior que 8, está fora do tabuleiro */
             if (currentPositionInCoord.goRight(counter).x > 8)
                 break;
 
             let oneRightPosition = currentPositionInCoord.goRight(counter).toNumber();
             let oneSquareRight = this.game.state.boardMap.get(oneRightPosition);
 
-            /*Se o quadrado da direita estiver vazio*/
+            /* Se o quadrado da direita estiver vazio */
             if (oneSquareRight == null) {
                 possibleMoves.walkPositions.push(oneRightPosition);
-            /*Se o quadrado da direita for uma peça inimiga*/
-            } else if (oneSquareRight.pieceColor != this.game.state.playerColor) {
+            /* Se o quadrado da direita for uma peça inimiga */
+            } else if (oneSquareRight.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(oneRightPosition);
-                break; /*Parar o loop pois há uma peça no caminho*/
-            /*Se o quadrado da direita for uma peça aliada*/
-            } else if (oneSquareRight.pieceColor == this.game.state.playerColor) {
-                break; /*Parar o loop pois há uma peça no caminho*/
+                break; /* Parar o loop pois há uma peça no caminho */
+            /* Se o quadrado da direita for uma peça aliada */
+            } else if (oneSquareRight.pieceColor == this.pieceColor) {
+                break; /* Parar o loop pois há uma peça no caminho */
             }
 
             counter++;
@@ -269,144 +272,144 @@ class Horse extends ChessPiece {
         super(game, pieceColor, position);
     }
 
-    /*Função que calcula as possíveis jogadas de acordo com 
-    a posição atual da peça*/
+    /* Função que calcula as possíveis jogadas de acordo com 
+    a posição atual da peça */
     getPossibleMoves(currentPosition) {
         const possibleMoves = new PossibleMoves();
         let currentPositionInCoord = BoardCoord.toCoord(currentPosition);
 
-        /*Checando se a movimentação está dentro do tabuleiro*/
-        /*2 pra cima e 1 pra direita*/
+        /* Checando se a movimentação está dentro do tabuleiro */
+        /* 2 pra cima e 1 pra direita */
         if (currentPositionInCoord.go(1, 2).y >= 1 
             && currentPositionInCoord.go(1, 2).x <= 8
         ) {
             let targetPositionNumber = currentPositionInCoord.go(1, 2).toNumber();
             let targetSquare = this.game.state.boardMap.get(targetPositionNumber);
 
-            /*Se o quadrado estiver livre*/
+            /* Se o quadrado estiver livre */
             if (targetSquare == null) {
                 possibleMoves.walkPositions.push(targetPositionNumber);
-            /*Se há uma peça inimiga no destino*/
-            } else if (targetSquare.pieceColor != this.game.state.playerColor) {
+            /* Se há uma peça inimiga no destino */
+            } else if (targetSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(targetPositionNumber)
             }
         }
 
-        /*Checando se a movimentação está dentro do tabuleiro*/
-        /*2 pra cima e 1 pra esquerda*/
+        /* Checando se a movimentação está dentro do tabuleiro */
+        /* 2 pra cima e 1 pra esquerda */
         if (currentPositionInCoord.go(-1, 2).y >= 1 
             && currentPositionInCoord.go(-1, 2).x >= 1
         ) {
             let targetPositionNumber = currentPositionInCoord.go(-1, 2).toNumber();
             let targetSquare = this.game.state.boardMap.get(targetPositionNumber);
 
-            /*Se o quadrado estiver livre*/
+            /* Se o quadrado estiver livre */
             if (targetSquare == null) {
                 possibleMoves.walkPositions.push(targetPositionNumber);
-            /*Se há uma peça inimiga no destino*/
-            } else if (targetSquare.pieceColor != this.game.state.playerColor) {
+            /* Se há uma peça inimiga no destino */
+            } else if (targetSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(targetPositionNumber)
             }
         }
 
-        /*Checando se a movimentação está dentro do tabuleiro*/
-        /*2 pra baixo e 1 pra direita*/
+        /* Checando se a movimentação está dentro do tabuleiro */
+        /* 2 pra baixo e 1 pra direita */
         if (currentPositionInCoord.go(1, -2).y <= 8
             && currentPositionInCoord.go(1, -2).x <= 8
         ) {
             let targetPositionNumber = currentPositionInCoord.go(1, -2).toNumber();
             let targetSquare = this.game.state.boardMap.get(targetPositionNumber);
 
-            /*Se o quadrado estiver livre*/
+            /* Se o quadrado estiver livre */
             if (targetSquare == null) {
                 possibleMoves.walkPositions.push(targetPositionNumber);
-            /*Se há uma peça inimiga no destino*/
-            } else if (targetSquare.pieceColor != this.game.state.playerColor) {
+            /* Se há uma peça inimiga no destino */
+            } else if (targetSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(targetPositionNumber)
             }
         }
 
-        /*Checando se a movimentação está dentro do tabuleiro*/
-        /*2 pra baixo e 1 pra esquerda*/
+        /* Checando se a movimentação está dentro do tabuleiro */
+        /* 2 pra baixo e 1 pra esquerda */
         if (currentPositionInCoord.go(-1, -2).y <= 8
             && currentPositionInCoord.go(-1, -2).x >= 1
         ) {
             let targetPositionNumber = currentPositionInCoord.go(-1, -2).toNumber();
             let targetSquare = this.game.state.boardMap.get(targetPositionNumber);
 
-            /*Se o quadrado estiver livre*/
+            /* Se o quadrado estiver livre */
             if (targetSquare == null) {
                 possibleMoves.walkPositions.push(targetPositionNumber);
-            /*Se há uma peça inimiga no destino*/
-            } else if (targetSquare.pieceColor != this.game.state.playerColor) {
+            /* Se há uma peça inimiga no destino */
+            } else if (targetSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(targetPositionNumber)
             }
         }
 
-        /*Checando se a movimentação está dentro do tabuleiro*/
-        /*2 pra esquerda e 1 pra cima*/
+        /* Checando se a movimentação está dentro do tabuleiro */
+        /* 2 pra esquerda e 1 pra cima */
         if (currentPositionInCoord.go(-2, 1).y >= 1
             && currentPositionInCoord.go(-2, 1).x >= 1
         ) {
             let targetPositionNumber = currentPositionInCoord.go(-2, 1).toNumber();
             let targetSquare = this.game.state.boardMap.get(targetPositionNumber);
 
-            /*Se o quadrado estiver livre*/
+            /* Se o quadrado estiver livre */
             if (targetSquare == null) {
                 possibleMoves.walkPositions.push(targetPositionNumber);
-            /*Se há uma peça inimiga no destino*/
-            } else if (targetSquare.pieceColor != this.game.state.playerColor) {
+            /* Se há uma peça inimiga no destino */
+            } else if (targetSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(targetPositionNumber)
             }
         }
 
-        /*Checando se a movimentação está dentro do tabuleiro*/
-        /*2 pra direita e 1 pra cima*/
+        /* Checando se a movimentação está dentro do tabuleiro */
+        /* 2 pra direita e 1 pra cima */
         if (currentPositionInCoord.go(2, 1).y >= 1
             && currentPositionInCoord.go(2, 1).x <= 8
         ) {
             let targetPositionNumber = currentPositionInCoord.go(2, 1).toNumber();
             let targetSquare = this.game.state.boardMap.get(targetPositionNumber);
 
-            /*Se o quadrado estiver livre*/
+            /* Se o quadrado estiver livre */
             if (targetSquare == null) {
                 possibleMoves.walkPositions.push(targetPositionNumber);
-            /*Se há uma peça inimiga no destino*/
-            } else if (targetSquare.pieceColor != this.game.state.playerColor) {
+            /* Se há uma peça inimiga no destino */
+            } else if (targetSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(targetPositionNumber)
             }
         }
 
-        /*Checando se a movimentação está dentro do tabuleiro*/
-        /*2 pra esquerda e 1 pra baixo*/
+        /* Checando se a movimentação está dentro do tabuleiro */
+        /* 2 pra esquerda e 1 pra baixo */
         if (currentPositionInCoord.go(-2, -1).y <= 8
             && currentPositionInCoord.go(-2, -1).x >= 1
         ) {
             let targetPositionNumber = currentPositionInCoord.go(-2, -1).toNumber();
             let targetSquare = this.game.state.boardMap.get(targetPositionNumber);
 
-            /*Se o quadrado estiver livre*/
+            /* Se o quadrado estiver livre */
             if (targetSquare == null) {
                 possibleMoves.walkPositions.push(targetPositionNumber);
-            /*Se há uma peça inimiga no destino*/
-            } else if (targetSquare.pieceColor != this.game.state.playerColor) {
+            /* Se há uma peça inimiga no destino */
+            } else if (targetSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(targetPositionNumber)
             }
         }
 
-        /*Checando se a movimentação está dentro do tabuleiro*/
-        /*2 pra direita e 1 pra baixo*/
+        /* Checando se a movimentação está dentro do tabuleiro */
+        /* 2 pra direita e 1 pra baixo */
         if (currentPositionInCoord.go(2, -1).y <= 8
             && currentPositionInCoord.go(2, -1).x <= 8
         ) {
             let targetPositionNumber = currentPositionInCoord.go(2, -1).toNumber();
             let targetSquare = this.game.state.boardMap.get(targetPositionNumber);
 
-            /*Se o quadrado estiver livre*/
+            /* Se o quadrado estiver livre */
             if (targetSquare == null) {
                 possibleMoves.walkPositions.push(targetPositionNumber);
-            /*Se há uma peça inimiga no destino*/
-            } else if (targetSquare.pieceColor != this.game.state.playerColor) {
+            /* Se há uma peça inimiga no destino */
+            } else if (targetSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(targetPositionNumber)
             }
         }
@@ -420,115 +423,115 @@ class Bishop extends ChessPiece {
         super(game, pieceColor, position);
     }
 
-    /*Função que calcula as possíveis jogadas de acordo com 
-    a posição atual da peça*/
+    /* Função que calcula as possíveis jogadas de acordo com 
+    a posição atual da peça */
     getPossibleMoves(currentPosition) {
         const possibleMoves = new PossibleMoves();
         let currentPositionInCoord = BoardCoord.toCoord(currentPosition);
         let counter = 1;
 
-        /*DIAGONAL CIMA DIREITA: Loop para ver a movimentação possível*/
+        /* DIAGONAL CIMA DIREITA: Loop para ver a movimentação possível */
         while (true) {
             let move = currentPositionInCoord.go(counter, counter);
 
-            /*Se o movimento não estiver dentro do limite do tabuleiro*/
+            /* Se o movimento não estiver dentro do limite do tabuleiro */
             if (move.x > 8 || move.y < 1)
                 break;
             
             let targetPosition = move.toNumber();
             let targetSquare = this.game.state.boardMap.get(targetPosition);
 
-            /*Se o quadrado alvo estiver vazio*/
+            /* Se o quadrado alvo estiver vazio */
             if (targetSquare == null) {
                 possibleMoves.walkPositions.push(targetPosition);
-            /*Se o quadrado alvo for uma peça inimiga*/
-            } else if (targetSquare.pieceColor != this.game.state.playerColor) {
+            /* Se o quadrado alvo for uma peça inimiga */
+            } else if (targetSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(targetPosition);
-                break; /*Parar o loop pois há uma peça no caminho*/
-            /*Se o quadrado alvo for uma peça aliada*/
-            } else if (targetSquare.pieceColor == this.game.state.playerColor) {
-                break; /*Parar o loop pois há uma peça no caminho*/
+                break; /* Parar o loop pois há uma peça no caminho */
+            /* Se o quadrado alvo for uma peça aliada */
+            } else if (targetSquare.pieceColor == this.pieceColor) {
+                break; /* Parar o loop pois há uma peça no caminho */
             }
 
             counter++;
         }
 
-        counter = 1; /*Voltando para 1*/
-        /*DIAGONAL CIMA ESQUERDA: Loop para ver a movimentação possível*/
+        counter = 1; /* Voltando para 1 */
+        /* DIAGONAL CIMA ESQUERDA: Loop para ver a movimentação possível */
         while (true) {
             let move = currentPositionInCoord.go(-counter, counter);
 
-            /*Se o movimento não estiver dentro do limite do tabuleiro*/
+            /* Se o movimento não estiver dentro do limite do tabuleiro */
             if (move.x < 1 || move.y < 1)
                 break;
             
             let targetPosition = move.toNumber();
             let targetSquare = this.game.state.boardMap.get(targetPosition);
 
-            /*Se o quadrado alvo estiver vazio*/
+            /* Se o quadrado alvo estiver vazio */
             if (targetSquare == null) {
                 possibleMoves.walkPositions.push(targetPosition);
-            /*Se o quadrado alvo for uma peça inimiga*/
-            } else if (targetSquare.pieceColor != this.game.state.playerColor) {
+            /* Se o quadrado alvo for uma peça inimiga */
+            } else if (targetSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(targetPosition);
-                break; /*Parar o loop pois há uma peça no caminho*/
-            /*Se o quadrado alvo for uma peça aliada*/
-            } else if (targetSquare.pieceColor == this.game.state.playerColor) {
-                break; /*Parar o loop pois há uma peça no caminho*/
+                break; /* Parar o loop pois há uma peça no caminho */
+            /* Se o quadrado alvo for uma peça aliada */
+            } else if (targetSquare.pieceColor == this.pieceColor) {
+                break; /* Parar o loop pois há uma peça no caminho */
             }
 
             counter++;
         }
 
-        counter = 1; /*Voltando para 1*/
-        /*DIAGONAL BAIXO ESQUERDA: Loop para ver a movimentação possível*/
+        counter = 1; /* Voltando para 1 */
+        /* DIAGONAL BAIXO ESQUERDA: Loop para ver a movimentação possível */
         while (true) {
             let move = currentPositionInCoord.go(-counter, -counter);
 
-            /*Se o movimento não estiver dentro do limite do tabuleiro*/
+            /* Se o movimento não estiver dentro do limite do tabuleiro */
             if (move.x < 1 || move.y > 8)
                 break;
             
             let targetPosition = move.toNumber();
             let targetSquare = this.game.state.boardMap.get(targetPosition);
 
-            /*Se o quadrado alvo estiver vazio*/
+            /* Se o quadrado alvo estiver vazio */
             if (targetSquare == null) {
                 possibleMoves.walkPositions.push(targetPosition);
-            /*Se o quadrado alvo for uma peça inimiga*/
-            } else if (targetSquare.pieceColor != this.game.state.playerColor) {
+            /* Senão, se o quadrado alvo for uma peça inimiga */
+            } else if (targetSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(targetPosition);
-                break; /*Parar o loop pois há uma peça no caminho*/
-            /*Se o quadrado alvo for uma peça aliada*/
-            } else if (targetSquare.pieceColor == this.game.state.playerColor) {
-                break; /*Parar o loop pois há uma peça no caminho*/
+                break; /* Parar o loop pois há uma peça no caminho */
+            /* Senão, se o quadrado alvo for uma peça aliada */
+            } else if (targetSquare.pieceColor == this.pieceColor) {
+                break; /* Parar o loop pois há uma peça no caminho */
             }
 
             counter++;
         }
 
-        counter = 1; /*Voltando para 1*/
-        /*DIAGONAL BAIXO DIREITA: Loop para ver a movimentação possível*/
+        counter = 1; /* Voltando para 1 */
+        /* DIAGONAL BAIXO DIREITA: Loop para ver a movimentação possível */
         while (true) {
             let move = currentPositionInCoord.go(counter, -counter);
 
-            /*Se o movimento não estiver dentro do limite do tabuleiro*/
+            /* Se o movimento não estiver dentro do limite do tabuleiro */
             if (move.x > 8 || move.y > 8)
                 break;
             
             let targetPosition = move.toNumber();
             let targetSquare = this.game.state.boardMap.get(targetPosition);
 
-            /*Se o quadrado alvo estiver vazio*/
+            /* Se o quadrado alvo estiver vazio */
             if (targetSquare == null) {
                 possibleMoves.walkPositions.push(targetPosition);
-            /*Se o quadrado alvo for uma peça inimiga*/
-            } else if (targetSquare.pieceColor != this.game.state.playerColor) {
+            /* Se o quadrado alvo for uma peça inimiga */
+            } else if (targetSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(targetPosition);
-                break; /*Parar o loop pois há uma peça no caminho*/
-            /*Se o quadrado alvo for uma peça aliada*/
-            } else if (targetSquare.pieceColor == this.game.state.playerColor) {
-                break; /*Parar o loop pois há uma peça no caminho*/
+                break; /* Parar o loop pois há uma peça no caminho */
+            /* Se o quadrado alvo for uma peça aliada */
+            } else if (targetSquare.pieceColor == this.pieceColor) {
+                break; /* Parar o loop pois há uma peça no caminho */
             }
 
             counter++;
@@ -543,215 +546,215 @@ class Queen extends ChessPiece {
         super(game, pieceColor, position);
     }
 
-    /*Função que calcula as possíveis jogadas de acordo com 
-    a posição atual da peça*/
+    /* Função que calcula as possíveis jogadas de acordo com 
+    a posição atual da peça */
     getPossibleMoves(currentPosition) {
         const possibleMoves = new PossibleMoves();
         let currentPositionInCoord = BoardCoord.toCoord(currentPosition);
         let counter = 1;
 
-        /*CIMA: Loop para ver a movimentação possível*/
+        /* CIMA: Loop para ver a movimentação possível */
         while (true) {
-            /*Se Y for menor a 1, está fora do tabuleiro*/
+            /* Se Y for menor a 1, está fora do tabuleiro */
             if (currentPositionInCoord.goUp(counter).y < 1)
                 break;
             
             let oneUpPosition = currentPositionInCoord.goUp(counter).toNumber();
             let oneSquareUp = this.game.state.boardMap.get(oneUpPosition);
 
-            /*Se o quadrado de cima estiver vazio*/
+            /* Se o quadrado de cima estiver vazio */
             if (oneSquareUp == null) {
                 possibleMoves.walkPositions.push(oneUpPosition);
-            /*Se o quadrado de cima for uma peça inimiga*/
-            } else if (oneSquareUp.pieceColor != this.game.state.playerColor) {
+            /* Se o quadrado de cima for uma peça inimiga */
+            } else if (oneSquareUp.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(oneUpPosition);
-                break; /*Parar o loop pois há uma peça no caminho*/
-            /*Se o quadrado de cima for uma peça aliada*/
-            } else if (oneSquareUp.pieceColor == this.game.state.playerColor) {
-                break; /*Parar o loop pois há uma peça no caminho*/
+                break; /* Parar o loop pois há uma peça no caminho */
+            /* Se o quadrado de cima for uma peça aliada */
+            } else if (oneSquareUp.pieceColor == this.pieceColor) {
+                break; /* Parar o loop pois há uma peça no caminho */
             }
 
             counter++;
         }
 
-        counter = 1; /*Voltando para 1*/
-        /*BAIXO: Loop para ver a movimentação possível*/
+        counter = 1; /* Voltando para 1 */
+        /* BAIXO: Loop para ver a movimentação possível */
         while (true) {
-            /*Se Y for maior que 8, está fora do tabuleiro*/
+            /* Se Y for maior que 8, está fora do tabuleiro */
             if (currentPositionInCoord.goDown(counter).y > 8)
                 break;
 
             let oneDownPosition = currentPositionInCoord.goDown(counter).toNumber();
             let oneSquareDown = this.game.state.boardMap.get(oneDownPosition);
 
-            /*Se o quadrado de baixo estiver vazio*/
+            /* Se o quadrado de baixo estiver vazio */
             if (oneSquareDown == null) {
                 possibleMoves.walkPositions.push(oneDownPosition);
-            /*Se o quadrado de baixo for uma peça inimiga*/
-            } else if (oneSquareDown.pieceColor != this.game.state.playerColor) {
+            /* Se o quadrado de baixo for uma peça inimiga */
+            } else if (oneSquareDown.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(oneDownPosition);
-                break; /*Parar o loop pois há uma peça no caminho*/
-            /*Se o quadrado de baixo for uma peça aliada*/
-            } else if (oneSquareDown.pieceColor == this.game.state.playerColor) {
-                break; /*Parar o loop pois há uma peça no caminho*/
+                break; /* Parar o loop pois há uma peça no caminho */
+            /* Se o quadrado de baixo for uma peça aliada */
+            } else if (oneSquareDown.pieceColor == this.pieceColor) {
+                break; /* Parar o loop pois há uma peça no caminho */
             }
 
             counter++;
         }
 
-        counter = 1; /*Voltando para 1*/
-        /*ESQUERDA: Loop para ver a movimentação possível*/
+        counter = 1; /* Voltando para 1 */
+        /* ESQUERDA: Loop para ver a movimentação possível */
         while (true) {
-            /*Se X for menor que 1, está fora do tabuleiro*/
+            /* Se X for menor que 1, está fora do tabuleiro */
             if (currentPositionInCoord.goLeft(counter).x < 1)
                 break;
 
             let oneLeftPosition = currentPositionInCoord.goLeft(counter).toNumber();
             let oneSquareLeft = this.game.state.boardMap.get(oneLeftPosition);
 
-            /*Se o quadrado da esquerda estiver vazio*/
+            /* Se o quadrado da esquerda estiver vazio */
             if (oneSquareLeft == null) {
                 possibleMoves.walkPositions.push(oneLeftPosition);
-            /*Se o quadrado da esquerda for uma peça inimiga*/
-            } else if (oneSquareLeft.pieceColor != this.game.state.playerColor) {
+            /* Se o quadrado da esquerda for uma peça inimiga */
+            } else if (oneSquareLeft.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(oneLeftPosition);
-                break; /*Parar o loop pois há uma peça no caminho*/
-            /*Se o quadrado da esquerda for uma peça aliada*/
-            } else if (oneSquareLeft.pieceColor == this.game.state.playerColor) {
-                break; /*Parar o loop pois há uma peça no caminho*/
+                break; /* Parar o loop pois há uma peça no caminho */
+            /* Se o quadrado da esquerda for uma peça aliada */
+            } else if (oneSquareLeft.pieceColor == this.pieceColor) {
+                break; /* Parar o loop pois há uma peça no caminho */
             }
 
             counter++;
         }
 
-        counter = 1; /*Voltando para 1*/
-        /*DIREITA: Loop para ver a movimentação possível*/
+        counter = 1; /* Voltando para 1 */
+        /* DIREITA: Loop para ver a movimentação possível */
         while (true) {
-            /*Se X for maior que 8, está fora do tabuleiro*/
+            /* Se X for maior que 8, está fora do tabuleiro */
             if (currentPositionInCoord.goRight(counter).x > 8)
                 break;
 
             let oneRightPosition = currentPositionInCoord.goRight(counter).toNumber();
             let oneSquareRight = this.game.state.boardMap.get(oneRightPosition);
 
-            /*Se o quadrado da direita estiver vazio*/
+            /* Se o quadrado da direita estiver vazio */
             if (oneSquareRight == null) {
                 possibleMoves.walkPositions.push(oneRightPosition);
-            /*Se o quadrado da direita for uma peça inimiga*/
-            } else if (oneSquareRight.pieceColor != this.game.state.playerColor) {
+            /* Se o quadrado da direita for uma peça inimiga */
+            } else if (oneSquareRight.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(oneRightPosition);
-                break; /*Parar o loop pois há uma peça no caminho*/
-            /*Se o quadrado da direita for uma peça aliada*/
-            } else if (oneSquareRight.pieceColor == this.game.state.playerColor) {
-                break; /*Parar o loop pois há uma peça no caminho*/
+                break; /* Parar o loop pois há uma peça no caminho */
+            /* Se o quadrado da direita for uma peça aliada */
+            } else if (oneSquareRight.pieceColor == this.pieceColor) {
+                break; /* Parar o loop pois há uma peça no caminho */
             }
 
             counter++;
         }
 
-        counter = 1; /*Voltando para 1*/
-        /*DIAGONAL CIMA DIREITA: Loop para ver a movimentação possível*/
+        counter = 1; /* Voltando para 1 */
+        /* DIAGONAL CIMA DIREITA: Loop para ver a movimentação possível */
         while (true) {
             let move = currentPositionInCoord.go(counter, counter);
 
-            /*Se o movimento não estiver dentro do limite do tabuleiro*/
+            /* Se o movimento não estiver dentro do limite do tabuleiro */
             if (move.x > 8 || move.y < 1)
                 break;
             
             let targetPosition = move.toNumber();
             let targetSquare = this.game.state.boardMap.get(targetPosition);
 
-            /*Se o quadrado alvo estiver vazio*/
+            /* Se o quadrado alvo estiver vazio */
             if (targetSquare == null) {
                 possibleMoves.walkPositions.push(targetPosition);
-            /*Se o quadrado alvo for uma peça inimiga*/
-            } else if (targetSquare.pieceColor != this.game.state.playerColor) {
+            /* Se o quadrado alvo for uma peça inimiga */
+            } else if (targetSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(targetPosition);
-                break; /*Parar o loop pois há uma peça no caminho*/
-            /*Se o quadrado alvo for uma peça aliada*/
-            } else if (targetSquare.pieceColor == this.game.state.playerColor) {
-                break; /*Parar o loop pois há uma peça no caminho*/
+                break; /* Parar o loop pois há uma peça no caminho */
+            /* Se o quadrado alvo for uma peça aliada */
+            } else if (targetSquare.pieceColor == this.pieceColor) {
+                break; /* Parar o loop pois há uma peça no caminho */
             }
 
             counter++;
         }
 
-        counter = 1; /*Voltando para 1*/
-        /*DIAGONAL CIMA ESQUERDA: Loop para ver a movimentação possível*/
+        counter = 1; /* Voltando para 1 */
+        /* DIAGONAL CIMA ESQUERDA: Loop para ver a movimentação possível */
         while (true) {
             let move = currentPositionInCoord.go(-counter, counter);
 
-            /*Se o movimento não estiver dentro do limite do tabuleiro*/
+            /* Se o movimento não estiver dentro do limite do tabuleiro */
             if (move.x < 1 || move.y < 1)
                 break;
             
             let targetPosition = move.toNumber();
             let targetSquare = this.game.state.boardMap.get(targetPosition);
 
-            /*Se o quadrado alvo estiver vazio*/
+            /* Se o quadrado alvo estiver vazio */
             if (targetSquare == null) {
                 possibleMoves.walkPositions.push(targetPosition);
-            /*Se o quadrado alvo for uma peça inimiga*/
-            } else if (targetSquare.pieceColor != this.game.state.playerColor) {
+            /* Se o quadrado alvo for uma peça inimiga */
+            } else if (targetSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(targetPosition);
-                break; /*Parar o loop pois há uma peça no caminho*/
-            /*Se o quadrado alvo for uma peça aliada*/
-            } else if (targetSquare.pieceColor == this.game.state.playerColor) {
-                break; /*Parar o loop pois há uma peça no caminho*/
+                break; /* Parar o loop pois há uma peça no caminho */
+            /* Se o quadrado alvo for uma peça aliada */
+            } else if (targetSquare.pieceColor == this.pieceColor) {
+                break; /* Parar o loop pois há uma peça no caminho */
             }
 
             counter++;
         }
 
-        counter = 1; /*Voltando para 1*/
-        /*DIAGONAL BAIXO ESQUERDA: Loop para ver a movimentação possível*/
+        counter = 1; /* Voltando para 1 */
+        /* DIAGONAL BAIXO ESQUERDA: Loop para ver a movimentação possível */
         while (true) {
             let move = currentPositionInCoord.go(-counter, -counter);
 
-            /*Se o movimento não estiver dentro do limite do tabuleiro*/
+            /* Se o movimento não estiver dentro do limite do tabuleiro */
             if (move.x < 1 || move.y > 8)
                 break;
             
             let targetPosition = move.toNumber();
             let targetSquare = this.game.state.boardMap.get(targetPosition);
 
-            /*Se o quadrado alvo estiver vazio*/
+            /* Se o quadrado alvo estiver vazio */
             if (targetSquare == null) {
                 possibleMoves.walkPositions.push(targetPosition);
-            /*Se o quadrado alvo for uma peça inimiga*/
-            } else if (targetSquare.pieceColor != this.game.state.playerColor) {
+            /* Se o quadrado alvo for uma peça inimiga */
+            } else if (targetSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(targetPosition);
-                break; /*Parar o loop pois há uma peça no caminho*/
-            /*Se o quadrado alvo for uma peça aliada*/
-            } else if (targetSquare.pieceColor == this.game.state.playerColor) {
-                break; /*Parar o loop pois há uma peça no caminho*/
+                break; /* Parar o loop pois há uma peça no caminho */
+            /* Se o quadrado alvo for uma peça aliada */
+            } else if (targetSquare.pieceColor == this.pieceColor) {
+                break; /* Parar o loop pois há uma peça no caminho */
             }
 
             counter++;
         }
 
-        counter = 1; /*Voltando para 1*/
-        /*DIAGONAL BAIXO DIREITA: Loop para ver a movimentação possível*/
+        counter = 1; /* Voltando para 1 */
+        /* DIAGONAL BAIXO DIREITA: Loop para ver a movimentação possível */
         while (true) {
             let move = currentPositionInCoord.go(counter, -counter);
 
-            /*Se o movimento não estiver dentro do limite do tabuleiro*/
+            /* Se o movimento não estiver dentro do limite do tabuleiro */
             if (move.x > 8 || move.y > 8)
                 break;
             
             let targetPosition = move.toNumber();
             let targetSquare = this.game.state.boardMap.get(targetPosition);
 
-            /*Se o quadrado alvo estiver vazio*/
+            /* Se o quadrado alvo estiver vazio */
             if (targetSquare == null) {
                 possibleMoves.walkPositions.push(targetPosition);
-            /*Se o quadrado alvo for uma peça inimiga*/
-            } else if (targetSquare.pieceColor != this.game.state.playerColor) {
+            /* Se o quadrado alvo for uma peça inimiga */
+            } else if (targetSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(targetPosition);
-                break; /*Parar o loop pois há uma peça no caminho*/
-            /*Se o quadrado alvo for uma peça aliada*/
-            } else if (targetSquare.pieceColor == this.game.state.playerColor) {
-                break; /*Parar o loop pois há uma peça no caminho*/
+                break; /* Parar o loop pois há uma peça no caminho */
+            /* Se o quadrado alvo for uma peça aliada */
+            } else if (targetSquare.pieceColor == this.pieceColor) {
+                break; /* Parar o loop pois há uma peça no caminho */
             }
 
             counter++;
@@ -766,8 +769,8 @@ class King extends ChessPiece {
         super(game, pieceColor, position);
     }
 
-    /*Função que calcula as possíveis jogadas de acordo com 
-    a posição atual da peça*/
+    /* Função que calcula as possíveis jogadas de acordo com 
+    a posição atual da peça */
     getPossibleMoves(currentPosition) {
         const possibleMoves = new PossibleMoves();
         let currentPositionInCoord = BoardCoord.toCoord(currentPosition);
@@ -778,11 +781,11 @@ class King extends ChessPiece {
         let oneSquareUp = this.game.state.boardMap.get(oneUpNumber);
         
         if (move.y >= 1) {
-            /*Se o quadrado estiver livre*/
+            /* Se o quadrado estiver livre */
             if (oneSquareUp == null) {
                 possibleMoves.walkPositions.push(oneUpNumber);
-            /*Se houver uma peça inimiga no quadrado*/
-            } else if (oneSquareUp.pieceColor != this.game.state.playerColor) {
+            /* Se houver uma peça inimiga no quadrado */
+            } else if (oneSquareUp.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(oneUpNumber);
             }
         }
@@ -791,11 +794,11 @@ class King extends ChessPiece {
         let oneSquareDown = this.game.state.boardMap.get(oneDownNumber);
         
         if (currentPositionInCoord.goDown(1).y <= 8) {
-            /*Se o quadrado estiver livre*/
+            /* Se o quadrado estiver livre */
             if (oneSquareDown == null) {
                 possibleMoves.walkPositions.push(oneDownNumber);
-            /*Se houver uma peça inimiga no quadrado*/
-            } else if (oneSquareDown.pieceColor != this.game.state.playerColor) {
+            /* Se houver uma peça inimiga no quadrado */
+            } else if (oneSquareDown.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(oneDownNumber);
             }
         }
@@ -805,11 +808,11 @@ class King extends ChessPiece {
         let oneSquareLeft = this.game.state.boardMap.get(oneLeftNumber);
         
         if (move.x >= 1) {
-            /*Se o quadrado estiver livre*/
+            /* Se o quadrado estiver livre */
             if (oneSquareLeft == null) {
                 possibleMoves.walkPositions.push(oneLeftNumber);
-            /*Se houver uma peça inimiga no quadrado*/
-            } else if (oneSquareLeft.pieceColor != this.game.state.playerColor) {
+            /* Se houver uma peça inimiga no quadrado */
+            } else if (oneSquareLeft.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(oneLeftNumber);
             }
         }
@@ -819,11 +822,11 @@ class King extends ChessPiece {
         let oneSquareRight = this.game.state.boardMap.get(oneRightNumber);
         
         if (move.x <= 8) {
-            /*Se o quadrado estiver livre*/
+            /* Se o quadrado estiver livre */
             if (oneSquareRight == null) {
                 possibleMoves.walkPositions.push(oneRightNumber);
-            /*Se houver uma peça inimiga no quadrado*/
-            } else if (oneSquareRight.pieceColor != this.game.state.playerColor) {
+            /* Se houver uma peça inimiga no quadrado */
+            } else if (oneSquareRight.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(oneRightNumber);
             }
         }
@@ -833,11 +836,11 @@ class King extends ChessPiece {
         let leftUpDiagonalSquare = this.game.state.boardMap.get(leftUpDiagonalNumber);
         
         if (move.x >= 1 && move.y >= 1) {
-            /*Se o quadrado estiver livre*/
+            /* Se o quadrado estiver livre */
             if (leftUpDiagonalSquare == null) {
                 possibleMoves.walkPositions.push(leftUpDiagonalNumber);
-            /*Se houver uma peça inimiga no quadrado*/
-            } else if (leftUpDiagonalSquare.pieceColor != this.game.state.playerColor) {
+            /* Se houver uma peça inimiga no quadrado */
+            } else if (leftUpDiagonalSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(leftUpDiagonalNumber);
             }
         }
@@ -847,11 +850,11 @@ class King extends ChessPiece {
         let rightUpDiagonalSquare = this.game.state.boardMap.get(rightUpDiagonalNumber);
         
         if (move.x <= 8 && move.y >= 1) {
-            /*Se o quadrado estiver livre*/
+            /* Se o quadrado estiver livre */
             if (rightUpDiagonalSquare == null) {
                 possibleMoves.walkPositions.push(rightUpDiagonalNumber);
-            /*Se houver uma peça inimiga no quadrado*/
-            } else if (rightUpDiagonalSquare.pieceColor != this.game.state.playerColor) {
+            /* Se houver uma peça inimiga no quadrado */
+            } else if (rightUpDiagonalSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(rightUpDiagonalNumber);
             }
         }
@@ -861,11 +864,11 @@ class King extends ChessPiece {
         let leftDownDiagonalSquare = this.game.state.boardMap.get(leftDownDiagonalNumber);
         
         if (move.x >= 1 && move.y <= 8) {
-            /*Se o quadrado estiver livre*/
+            /* Se o quadrado estiver livre */
             if (leftDownDiagonalSquare == null) {
                 possibleMoves.walkPositions.push(leftDownDiagonalNumber);
-            /*Se houver uma peça inimiga no quadrado*/
-            } else if (leftDownDiagonalSquare.pieceColor != this.game.state.playerColor) {
+            /* Se houver uma peça inimiga no quadrado */
+            } else if (leftDownDiagonalSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(leftDownDiagonalNumber);
             }
         }
@@ -875,11 +878,11 @@ class King extends ChessPiece {
         let rightDownDiagonalSquare = this.game.state.boardMap.get(rightDownDiagonalNumber);
         
         if (move.x <= 8 && move.y <= 8) {
-            /*Se o quadrado estiver livre*/
+            /* Se o quadrado estiver livre */
             if (rightDownDiagonalSquare == null) {
                 possibleMoves.walkPositions.push(rightDownDiagonalNumber);
-            /*Se houver uma peça inimiga no quadrado*/
-            } else if (rightDownDiagonalSquare.pieceColor != this.game.state.playerColor) {
+            /* Se houver uma peça inimiga no quadrado */
+            } else if (rightDownDiagonalSquare.pieceColor != this.pieceColor) {
                 possibleMoves.attackPositions.push(rightDownDiagonalNumber);
             }
         }
@@ -888,4 +891,11 @@ class King extends ChessPiece {
     }
 }
 
-export { Pawn, Rook, Horse, Bishop, Queen, King }
+export {
+    Pawn, 
+    Rook,
+    Horse,
+    Bishop,
+    Queen,
+    King
+}

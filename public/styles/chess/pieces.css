@@ -1,4 +1,4 @@
-/*Peças claras*/
+/* Peças brancas */
 
 .white.rook {
     content: url(../../img/white_rook.png);
@@ -24,7 +24,7 @@
     content: url(../../img/white_pawn.png);
 }
 
-/*Peças escuras*/
+/* Peças pretas */
 
 .dark.rook {
     content: url(../../img/dark_rook.png);

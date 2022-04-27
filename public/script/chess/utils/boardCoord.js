@@ -4,8 +4,8 @@ class Coord {
         this.y = y;
     }
 
-    /*Converte essa Coord para um número do tabuleiro
-    Ex: {x: 8 y: 8} => 64*/
+    /* Converte essa Coord para um número do tabuleiro
+    Ex: { x: 8, y: 8 } => 64 */
     toNumber() {
         return ((this.y - 1) * 8) + this.x;
     }
@@ -37,8 +37,8 @@ class Coord {
 }
 
 class BoardCoord {
-    /*O "x" representa a coluna e o "y" a linha do quadrado
-    começando pelo topo (ou seja, "y" é maior conforme desce)*/
+    /* O "x" representa a coluna e o "y" a linha do quadrado
+    começando pelo topo (ou seja, "y" é maior conforme desce) */
     static toCoord(num) {
         if (num < 0 || num > 64) 
             throw new Error(num + " não é um número válido! Precisa estar entre 1 e 64");
@@ -48,9 +48,9 @@ class BoardCoord {
 
         let x = num % MAX;
 
-        /*Usando o Math.ceil para arredondar o valor para cima
+        /* Usando o Math.ceil para arredondar o valor para cima
         o Math.min para o valor mínimo do cálculo ser 1
-        e o Math.max para o valor máximo do cálculo ser 8*/
+        e o Math.max para o valor máximo do cálculo ser 8 */
         let y = Math.ceil(Math.min(Math.max(num / 8, MIN), MAX));
         
         if (x === 0) x = MAX;
@@ -58,7 +58,7 @@ class BoardCoord {
         return new Coord(x, y);
     }
 
-    /*Espelha o movimento no tabuleiro*/
+    /* Espelha o movimento no tabuleiro */
     static mirrorPlay(oldPositionCoord, newPositionCoord) {
         const mirroredOldPosition = new Coord(
             oldPositionCoord.x, 
@@ -79,4 +79,7 @@ class BoardCoord {
     }
 }
 
-export { Coord, BoardCoord }
+export { 
+    Coord, 
+    BoardCoord 
+}

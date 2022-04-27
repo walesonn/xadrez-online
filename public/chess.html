@@ -67,17 +67,27 @@
 
             socket.on('connect', () => {
                 const roomId = localStorage.getItem('room-id');
-                socket.emit('enteredRoom', socket.id, roomId);
+                socket.emit('enteredRoom', roomId);
             });
 
             socket.on('showSendLinkMessage', () => {
-                /*Exibe uma mensagem de boas vindas e um
-                exibe um botão para copiar o link da sala*/
+                /* Exibe uma mensagem de boas-vindas e
+                um botão para copiar o link da sala */
                 const message = getMessage(MessageType.SendLink);
                 messageBox.show(message, true);
             });
 
-            socket.on('startGame', room => {
+            socket.on('startGame', (room, homeUrl) => {
+                console.log(`> "startGame" received from server`);
+
+                if (room.isClosed) {
+                    const message = getMessage(MessageType.RoomClosed);
+                    messageBox.show(message);
+                    messageBox.loadPageOnClose(homeUrl);
+                    
+                    return;
+                }
+
                 switch (socket.id) {
                     case room.whiteId:
                         setup(PieceColor.White, room.id);
@@ -85,14 +95,18 @@
                     case room.darkId:
                         setup(PieceColor.Dark, room.id);
                         break;
-                    default:
-                        break;
                 }
+            });
+
+            socket.on('playerDisconnected', homeUrl => {
+                const message = getMessage(MessageType.PlayerDisconnected);
+                messageBox.show(message);
+                messageBox.loadPageOnClose(homeUrl);
             });
 
             socket.on('pieceMoved', (oldPosition, newPosition) => {
                 console.log('> "pieceMoved" received from server (rendering mirrored play)');
-                game.renderOpponentPlay(oldPosition, newPosition)
+                game.receiveOpponentPlay(oldPosition, newPosition)
             });
         });
     </script>
