@@ -3,15 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles/chess/chess.css">
-    <link rel="stylesheet" href="styles/chess/pieces.css">
+    <link rel="shortcut icon" href="./img/ico.png" type="image/x-icon">
     <title>Xadrez Online</title>
+
+    <link rel="stylesheet" href="styles/chess/chess.css">
+    <link rel="stylesheet" href="styles/chess/message-box.css">
+    <link rel="stylesheet" href="styles/chess/pieces.css">
+    <script src="/socket.io/socket.io.js"></script>
 </head>
 <body>
     <div id="board"></div>
-    <p id="message" class="hidden"></p>
+
+    <div id="message-box-modal" class="modal">
+        <div class="modal-content">
+            <p id="message"></p>
+            <button id="message-box-copy">COPIAR LINK</button>
+            <button id="message-box-close">FECHAR</button>
+        </div>
+    </div>
     
-    <script src="/socket.io/socket.io.js"></script>
-    <script type="module" src="script/chess/core.js"></script>
+    <script type="module">
+        import { PieceType, PieceColor } from './script/chess/pieceClasses.js';
+        import { MessageType, getMessage } from './script/chess/utils/messages.js';
+        import initializeMessageBox from './script/chess/message-box.js'
+        import createBoard from './script/chess/utils/createBoard.js';
+        import Game from './script/chess/game.js';
+
+        window.addEventListener('load', (event) => {
+
+            const socket = io();
+
+            const game = new Game();
+            const board = createBoard();
+            const messageBox = initializeMessageBox();
+            
+            /* Cria a UI da mesa */
+            board.render();
+
+            /* Configura um observer e inicia o jogo */
+            function setup(thisPlayerColor, roomId) {
+                game.subscribe((command) => {
+                    /*Comandos*/
+                    switch (command.type) {
+                        case 'pieceMoved':
+                            game.renderPieces(command.thisBoardMap);
+                            socket.emit(
+                                command.type, 
+                                command.mirroredOldPosition, 
+                                command.mirroredNewPosition, 
+                                roomId);
+                            break;
+                    }
+
+                    /*Mandando para o server o comando que o jogador executou*/
+                    console.log(`> Emitting event -> ${command.type}`);
+                    socket.emit(command.type, command);
+                });
+
+                game.start(board, thisPlayerColor, roomId);
+            }
+
+            /* Mensagens recebidas do servidor */
+
+            socket.on('connect', () => {
+                const roomId = localStorage.getItem('room-id');
+                socket.emit('enteredRoom', socket.id, roomId);
+            });
+
+            socket.on('showSendLinkMessage', () => {
+                /*Exibe uma mensagem de boas vindas e um
+                exibe um botão para copiar o link da sala*/
+                const message = getMessage(MessageType.SendLink);
+                messageBox.show(message, true);
+            });
+
+            socket.on('startGame', room => {
+                switch (socket.id) {
+                    case room.whiteId:
+                        setup(PieceColor.White, room.id);
+                        break;
+                    case room.darkId:
+                        setup(PieceColor.Dark, room.id);
+                        break;
+                    default:
+                        break;
+                }
+            });
+
+            socket.on('pieceMoved', (oldPosition, newPosition) => {
+                console.log('> "pieceMoved" received from server (rendering mirrored play)');
+                game.renderOpponentPlay(oldPosition, newPosition)
+            });
+        });
+    </script>
 </body>
 </html>

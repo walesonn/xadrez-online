@@ -1,1 +1,0 @@
-const isInCheck = "[ ! ] Você está em xeque. Só é possível mexer o rei.";
