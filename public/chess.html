@@ -55,7 +55,7 @@
                             break;
                     }
 
-                    /*Mandando para o server o comando que o jogador executou*/
+                    /* Enviando o comando que o jogador executou ao server */
                     console.log(`> Emitting event -> ${command.type}`);
                     socket.emit(command.type, command);
                 });
