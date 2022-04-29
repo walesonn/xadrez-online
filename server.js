@@ -120,6 +120,6 @@ io.on('connection', socket => {
     });
 });
 
-server.listen(port, host, () => {
-    console.log(`Listening at ${host}:${port}`);
+server.listen(process.env.PORT || 3000, () => {
+    console.log(`Listening at ${host} on port ${port}`);
 });
