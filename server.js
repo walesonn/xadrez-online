@@ -10,6 +10,8 @@ const io = new Server(server);
 const host = 'localhost';
 const port = 3000;
 
+/* Array que armazena objetos que representam uma 
+sala de jogo criada */
 const gameRooms = [];
 
 app.use(express.static('public'));
@@ -18,6 +20,7 @@ app.get("/", (req, res) => {
     res.sendFile('index.html', { root: 'public' });
 });
 
+/* Cria o objeto que representa uma sala do jogo */
 function createRoom() {
     const room = {
         id: null,
@@ -29,6 +32,7 @@ function createRoom() {
     return room;
 }
 
+/* Fecha a sala de jogo com o ID passado */
 function closeRoom(roomId) {
     for (let i = 0; i < gameRooms.length; i++) {
         if (gameRooms[i].id == roomId) {
@@ -73,19 +77,19 @@ io.on('connection', socket => {
 
         let room = null;
 
-        /*Verificando se a sala já foi criada*/
+        /* Verificando se a sala já foi criada */
         gameRooms.forEach(e => {
             if (e.id == roomId)
                 room = e;
         });
 
-        /*Se a sala existir*/
+        /* Se a sala existir */
         if (room) {
             if (room.darkId === null) room.darkId = socket.id;
             else if (room.whiteId === null) room.whiteId = socket.id;
             
-            /*Manda o comando de iniciar o jogo para 
-            ambos os jogadores*/
+            /* Manda o comando de iniciar o jogo para 
+            ambos os jogadores */
             io.to(roomId).emit(
                 'startGame', room, `http://${host}:${port}`);
         } else {
@@ -95,9 +99,9 @@ io.on('connection', socket => {
             
             gameRooms.push(room);
 
-            /*Como este é o primeiro jogador, exibir uma
+            /* Como este é o primeiro jogador, exibir uma
             mensagem com um botão disponível para copiar o
-            link do site*/
+            link do site */
             socket.emit('showSendLinkMessage');
         }
     });
