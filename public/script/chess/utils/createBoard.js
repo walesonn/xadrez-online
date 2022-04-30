@@ -1,5 +1,7 @@
+import { PieceColor } from '../pieceClasses.js'
+
 /* Cria e exibe o tabuleiro de xadrez na página */
-export default function createBoard() {
+export default function createBoard(playerColor) {
 
     const board = document.querySelector('#board');
 
@@ -13,7 +15,7 @@ export default function createBoard() {
         }
 
         let column = 0;
-        let black = false;
+        let black = (playerColor == PieceColor.White) ? false : true;
         
         /* Iterando 64 vezes (número de quadrados de um tabuleiro de xadrez) */
         for (let i = 1; i <= 64; i++) {
