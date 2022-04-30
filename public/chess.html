@@ -66,8 +66,7 @@
             /* Mensagens recebidas do servidor */
 
             socket.on('connect', () => {
-                const roomId = localStorage.getItem('room-id');
-                socket.emit('enteredRoom', roomId);
+                socket.emit('enteredRoom');
             });
 
             socket.on('showSendLinkMessage', () => {

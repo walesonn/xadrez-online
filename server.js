@@ -66,10 +66,10 @@ io.on('connection', socket => {
         );
     });
 
-    /*Ao receber o evento de que um jogador entrou na sala*/
-    socket.on('enteredRoom', roomId => {   
-        socket.join(roomId);
-        console.log(`> Player [${socket.id}] connected in room [${roomId}]`);
+    /* Ao receber o evento de que um jogador entrou na sala */
+    socket.on('enteredRoom', () => {
+		let url = socket.handshake.headers.referer.split('/');
+		let roomId = url[3];
 
         let room = null;
 
