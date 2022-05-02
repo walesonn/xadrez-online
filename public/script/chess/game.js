@@ -1,4 +1,5 @@
 import initializeMessageBox from './message-box.js'
+import addChoosePawnTransformationListener from './listeners/choose-pawn-transformation.js';
 import addDocumentMouseListeners from './listeners/document-mouse-listeners.js';
 import addSquareMouseListeners from './listeners/square-mouse-listener.js';
 import { MessageType, getMessage } from './utils/messages.js';
@@ -21,6 +22,7 @@ export default class Game {
         selectedPiece = null,
         selectedPiecePosition = null,
         pieceObj = null,
+        pawnToTransform = null,
         possibleMoves = {},
         checkIndicative = []
     ) {
@@ -31,6 +33,7 @@ export default class Game {
         this.selectedPiece = selectedPiece;
         this.selectedPiecePosition = selectedPiecePosition;
         this.pieceObj = pieceObj;
+        this.pawnToTransform = pawnToTransform;
         this.possibleMoves = possibleMoves;
         this.checkIndicative = checkIndicative;
     }
@@ -137,7 +140,7 @@ export default class Game {
 
     /* Função chamada quando o player clica em um novo quadrado estando
     com uma peça selecionada */
-    secondSelectionCall(target, invokedByDragAndDrop = false) {
+    secondSelectionCall(event, target, invokedByDragAndDrop = false) {
         let positionClicked;
         
         /* Pega a posição selecionada (de maneiras diferentes caso a seleção
@@ -145,6 +148,103 @@ export default class Game {
         target.classList.contains("chess-piece") 
             ? positionClicked = parseInt(target.parentNode.id.replace("square", ""))
             : positionClicked = parseInt(target.id.replace("square", ""));
+        
+        /* Verificando uma possível tentativa de roque
+        Se a peça selecionada é o rei
+        e se o filho do target existir
+        e se este filho contém as classes rook e this.state.playerColor */
+        if (this.pieceObj.constructor.name.toLowerCase() == PieceType.King
+            && target.firstChild
+            && (target.firstChild.classList.contains(PieceType.Rook) 
+                && target.firstChild.classList.contains(this.state.playerColor))
+        ) {
+            const rookObj = this.state.boardMap.get(positionClicked);
+            const kingObj = this.pieceObj;
+
+            /* Só continuar se nem o rei e nem a torre foram movidos ainda */
+            if (kingObj.alreadyMoved || rookObj.alreadyMoved) return;
+
+            /* Se a torre estiver na esquerda do rei 
+            e o caminho até esta torre estiver livre */
+            if (rookObj.position < kingObj.position
+                && this.state.boardMap.get(60) == null
+                && this.state.boardMap.get(59) == null
+                && this.state.boardMap.get(58) == null
+            ) {
+                let mirroredPlay;
+
+                /* Mover o rei pro quadrado 59 */
+
+                kingObj.moveTo(59);
+
+                mirroredPlay = BoardCoord.mirrorPlay(
+                    BoardCoord.toCoord(61), 
+                    BoardCoord.toCoord(59)
+                );
+
+                this.notifyAll({
+                    type: 'pieceMoved',
+                    thisBoardMap: this.state.boardMap,
+                    mirroredOldPosition: mirroredPlay.oldPosition,
+                    mirroredNewPosition: mirroredPlay.newPosition
+                });
+
+                /* Mover a torre pro quadrado 60 */
+
+                rookObj.moveTo(60);
+
+                mirroredPlay = BoardCoord.mirrorPlay(
+                    BoardCoord.toCoord(57), 
+                    BoardCoord.toCoord(60)
+                );
+
+                this.notifyAll({
+                    type: 'pieceMoved',
+                    thisBoardMap: this.state.boardMap,
+                    mirroredOldPosition: mirroredPlay.oldPosition,
+                    mirroredNewPosition: mirroredPlay.newPosition
+                });
+            /* Se a torre estiver na direita do rei 
+            e o caminho até esta torre estiver livre */
+            } else if (rookObj.position > kingObj.position
+                && this.state.boardMap.get(62) == null
+                && this.state.boardMap.get(63) == null
+            ) {
+                let mirroredPlay;
+
+                /* Mover o rei pro quadrado 63 */
+
+                kingObj.moveTo(63);
+
+                mirroredPlay = BoardCoord.mirrorPlay(
+                    BoardCoord.toCoord(61), 
+                    BoardCoord.toCoord(63)
+                );
+
+                this.notifyAll({
+                    type: 'pieceMoved',
+                    thisBoardMap: this.state.boardMap,
+                    mirroredOldPosition: mirroredPlay.oldPosition,
+                    mirroredNewPosition: mirroredPlay.newPosition
+                });
+
+                /* Mover a torre pro quadrado 62 */
+
+                rookObj.moveTo(62);
+
+                mirroredPlay = BoardCoord.mirrorPlay(
+                    BoardCoord.toCoord(64), 
+                    BoardCoord.toCoord(62)
+                );
+
+                this.notifyAll({
+                    type: 'pieceMoved',
+                    thisBoardMap: this.state.boardMap,
+                    mirroredOldPosition: mirroredPlay.oldPosition,
+                    mirroredNewPosition: mirroredPlay.newPosition
+                });
+            }
+        }
 
         /* Booleana que diz se pelo menos um dos arrays não está vazio */
         let arrayNotEmpty = this.possibleMoves.walkPositions.length > 0 
@@ -163,7 +263,28 @@ export default class Game {
             
             /* Movendo a peça para o lugar clicado */
             this.pieceObj.moveTo(positionClicked);
-            
+
+            /* Se for um peão e ele tiver chego no fim do tabuleiro 
+            deixar o jogador escolher a transformação */
+            if (this.pieceObj.constructor.name.toLowerCase() == PieceType.Pawn) {
+                let newPosToCoord = BoardCoord.toCoord(positionClicked);
+                
+                if (newPosToCoord.y == 1) {
+                    this.pawnToTransform = this.pieceObj;
+
+                    const choosePawnTransformation = document
+                        .querySelector('#choose-pawn-transformation');
+
+                    [...choosePawnTransformation.children].forEach(img => {
+                        img.classList.add(this.state.playerColor);
+                    });
+                    
+                    choosePawnTransformation.style.display = 'block';
+                    choosePawnTransformation.style.left = event.clientX + "px";
+                    choosePawnTransformation.style.top = event.clientY + "px";
+                }
+            }
+
             const command = {
                 type: 'pieceMoved',
                 thisBoardMap: this.state.boardMap,
@@ -171,7 +292,7 @@ export default class Game {
                 mirroredNewPosition: mirroredPlay.newPosition
             }
 
-            this.notifyAll(command, this.roomId);
+            this.notifyAll(command);
         }
 
         /* Se essa função não foi invocada após um drag and drop
@@ -270,11 +391,11 @@ export default class Game {
             /* Adicionando a fileira de peões da parte superior */
             if (i >= 9 && i <= 16) {
                 this.state.boardMap.set(
-                    i, new Pawn(this, colorOnTop, i));
+                    i, new Pawn(this, colorOnTop, i, true));
             /* Adicionando a fileira de peões da parte inferior */
             } else if (i >= 49 && i <= 56) {
                 this.state.boardMap.set(
-                    i, new Pawn(this, colorOnBottom, i));
+                    i, new Pawn(this, colorOnBottom, i, true));
             }
         }
     }
@@ -395,8 +516,19 @@ export default class Game {
     }
 
     addListeners() {
+        addChoosePawnTransformationListener(this);
         addSquareMouseListeners(this);
         addDocumentMouseListeners(this);
+    }
+
+    setTurn(isMyTurn) {
+        const boardDiv = document.querySelector('#board');
+
+        this.state.isMyTurn = isMyTurn;
+                
+        isMyTurn 
+            ? boardDiv.classList.add('your-turn') 
+            : boardDiv.classList.remove('your-turn')
     }
     
     /* Configurações iniciais */
@@ -407,7 +539,7 @@ export default class Game {
 
         /* Se o jogador for o das peças brancas, ele começa jogando */
         if (playerColor == PieceColor.White)
-            this.state.isMyTurn = true;
+            this.setTurn(true);
 
         /* Preenche o boardMap (configuração inicial) */
         this.fillBoardMap();

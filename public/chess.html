@@ -21,9 +21,24 @@
             <button id="message-box-close">FECHAR</button>
         </div>
     </div>
+
+    <div id="choose-pawn-transformation">
+        <img class="choice chess-piece rook">
+        <img class="choice chess-piece horse">
+        <img class="choice chess-piece bishop">
+        <img class="choice chess-piece queen">
+    </div>
     
     <script type="module">
-        import { PieceType, PieceColor } from './script/chess/pieceClasses.js';
+        import {
+            PieceType, 
+            PieceColor,
+            Queen,
+            Rook,
+            Horse,
+            Bishop
+        } from './script/chess/pieceClasses.js';
+        
         import { MessageType, getMessage } from './script/chess/utils/messages.js';
         import initializeMessageBox from './script/chess/message-box.js'
         import createBoard from './script/chess/utils/createBoard.js';
@@ -52,7 +67,7 @@
                     }
 
                     /* Enviando o comando que o jogador executou ao server */
-                    console.log(`> Emitting event -> ${command.type}`);
+                    /*console.log(`> Emitting event -> ${command.type}`);*/
                     socket.emit(command.type, command);
                 });
 
@@ -78,7 +93,7 @@
             });
 
             socket.on('startGame', (room, homeUrl) => {
-                console.log(`> "startGame" received from server`);
+                /*console.log(`> "startGame" received from server`);*/
 
                 if (room.isClosed) {
                     const message = getMessage(MessageType.RoomClosed);
@@ -105,8 +120,51 @@
             });
 
             socket.on('pieceMoved', (oldPosition, newPosition) => {
-                console.log('> "pieceMoved" received from server (rendering mirrored play)');
+                /*console.log('> "pieceMoved" received from server (rendering mirrored play)');*/
                 game.receiveOpponentPlay(oldPosition, newPosition)
+            });
+
+            socket.on('pawnTransformed', command => {
+                /*console.log('> "pawnTransformed" received from server');*/
+                const { pawnPosition, pieceColor, transformType } = command;
+                let transformObject;
+
+                switch (transformType) {
+                    case PieceType.Queen:
+                        transformObject = new Queen(
+                            game,
+                            pieceColor,
+                            pawnPosition)
+                        break;
+                    case PieceType.Rook:
+                        transformObject = new Rook(
+                            game,
+                            pieceColor,
+                            pawnPosition)
+                        break;
+                    case PieceType.Horse:
+                        transformObject = new Horse(
+                            game,
+                            pieceColor,
+                            pawnPosition)
+                        break;
+                    case PieceType.Bishop:
+                        transformObject = new Bishop(
+                            game,
+                            pieceColor,
+                            pawnPosition)
+                        break;
+                }
+
+                game.state.boardMap.set(
+                    pawnPosition,
+                    transformObject
+                );
+
+                document.getElementById(`square${pawnPosition}`)
+                    .firstChild
+                    .classList
+                    .replace(PieceType.Pawn, transformType);
             });
         });
     </script>

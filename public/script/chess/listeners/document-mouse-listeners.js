@@ -53,35 +53,36 @@ export default function addMouseListeners(game) {
         });
     
         if (squareOver)
-            game.secondSelectionCall(squareOver, true);
+            game.secondSelectionCall(e, squareOver, true);
      
         if (!piece) return;
         
-        piece.style.position = "static";
-        piece.style.left = "auto";
-        piece.style.top = "auto";
-        piece.style.zIndex = 1000;
+        piece.style.position = 'static';
+        piece.style.left = 'auto';
+        piece.style.top = 'auto';
+        piece.style.zIndex = '1000';
         
-        piece.style.height = "60px";
-        piece.style.width = "60px";
+        piece.style.height = '60px';
+        piece.style.width = '60px';
     }
     
     function onMouseDown(e) {
         /* Se o target do evento ter a classe "chess-piece" 
         e se for uma peça que o player possa mexer (peça de sua cor)
         e se for o seu turno */
-        if (e.target.classList.contains("chess-piece")
+        if (e.target.classList.contains('chess-piece')
+            && !e.target.classList.contains('choice')
             && e.target.classList.contains(game.state.playerColor)
             && game.state.isMyTurn
         ) {
             isDown = true;
             
             piece = e.target;
-            piece.style.position = "absolute";
+            piece.style.position = 'absolute';
             piece.style.zIndex = 1001;
             
-            piece.style.height = "70px";
-            piece.style.width = "70px";
+            piece.style.height = '70px';
+            piece.style.width = '70px';
     
             movingFrom = e.target.parentNode;
     

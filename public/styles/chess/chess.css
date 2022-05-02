@@ -29,10 +29,44 @@ body {
     transform: translate(-50%, -50%);
     
     border: 5px solid var(--lighter-square);
+    background-color: var(--darker-square);
+
     height: 610px;
     width: 610px;
 
     cursor: pointer;
+
+    z-index: 0;
+}
+
+#board.your-turn {
+    border: 5px solid rgb(128, 255, 82);
+}
+
+#choose-pawn-transformation {
+    display: none;
+    height: fit-content;
+    width: fit-content;
+    border: 2px solid rgb(227, 160, 102);
+    background-color: rgb(205, 81, 36);
+    
+    padding: 2px;
+
+    position: absolute;
+    left: 50%; top: 50%;
+    
+    z-index: 2;
+}
+
+#choose-pawn-transformation img {
+    cursor: pointer;
+    border: 2px dashed rgb(227, 160, 102);
+    
+    z-index: 3;
+}
+
+#choose-pawn-transformation img:hover {
+    background-color: rgb(227, 107, 63);
 }
 
 .square {
@@ -51,7 +85,7 @@ body {
     top: auto;
     left: auto;
 
-    z-index: 1000;
+    z-index: 500;
 
     height: 60px;
     width: 60px;

@@ -32,13 +32,12 @@
     border: 1px solid #888;
     
     margin: auto;
-    padding: 20px;
+    padding: 20px 40px;
 
-    width: 500px;
+    width: 800px;
 }
 
-#message-box-copy,
-#message-box-close {
+#how-works-close {
     background-color: #7db5b6;
     color: #f0f9fc;
 
@@ -51,15 +50,8 @@
     font-weight: bold;
 }
 
-#message-box-copy {
-    display: none;
-    margin-bottom: 5px;
-}
-
-#message-box-copy:hover,
-#message-box-copy:focus,
-#message-box-close:hover,
-#message-box-close:focus {
+#how-works-close:hover,
+#how-works-close:focus {
     cursor: pointer;
 
     text-decoration: none;
@@ -68,14 +60,15 @@
     filter: brightness(108%);
 }
 
-#message-box-copy:active,
-#message-box-close:active {
+#how-works-close:active {
     filter: brightness(113%);
 }
 
-#message {
+#how-works-text {
+    font-family: Arial;
     font-size: 22px;
-    text-align: center;
+    text-align: justify;
+    
     overflow-wrap: break-word;
 
     padding: 40px 0px;

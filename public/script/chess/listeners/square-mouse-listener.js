@@ -1,10 +1,10 @@
 export default function addSquareMouseListeners(game) {
     
-    const squares = [...document.querySelectorAll("#board .square")];
+    const squares = [...document.querySelectorAll('#board .square')];
     
     /* Adicionando o listener em todos os quadrados do tabuleiro */
     squares.forEach(square => {
-        square.addEventListener("mousedown", (e) => {
+        square.addEventListener('mousedown', (e) => {
             squareMouseDownListener(e, game, square);
         });
     });
@@ -41,6 +41,6 @@ export default function addSquareMouseListeners(game) {
         
         /* Se o jogador estiver com uma peça selecionada */
         if (game.selectedPiece && !game.firstSelection)
-            game.secondSelectionCall(event.target);
+            game.secondSelectionCall(event, event.target);
     }
 }

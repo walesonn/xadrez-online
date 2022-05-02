@@ -83,16 +83,51 @@ body .container {
     border: 1px solid #ddd;
 }
 
+#how-works-open {
+    cursor: pointer;
+
+    position: absolute;
+    right: 15px;
+    bottom: 72px;
+
+    width: clamp(180px, 20vw, 20vw);
+    height: 70px;
+    
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+
+    border-radius: 5px;
+
+    background: #069;
+    color: #FFF;
+
+    border: none;
+    outline: none;
+}
+
+#how-works-open:hover {
+    background: #0e6b9a;
+    border: 1px solid #ddd;
+}
+
+#how-works-open:active {
+    background: #1a86bc;
+    border: 1px solid rgb(228, 228, 228);
+}
+
 footer {
     position: absolute !important;
     bottom: 0 !important;
+
+    text-align: center;
 
     display: flex;
     align-items: center;
     justify-content: center;
     
     width: 100%;
-    height: 7%;
+    height: clamp(57px, 7vh, 7vh);
 
     background: white;
     color: var(--background);

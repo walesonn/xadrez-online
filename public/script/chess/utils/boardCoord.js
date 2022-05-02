@@ -6,9 +6,7 @@ class Coord {
 
     /* Converte essa Coord para um número do tabuleiro
     Ex: { x: 8, y: 8 } => 64 */
-    toNumber() {
-        return ((this.y - 1) * 8) + this.x;
-    }
+    toNumber = () => ((this.y - 1) * 8) + this.x;
 
     go(x, y) {
         let coord = new Coord(this.x + x, this.y - y);
@@ -58,13 +56,15 @@ class BoardCoord {
         return new Coord(x, y);
     }
 
+    /* Espelha uma única posição do tabuleiro */
+    static mirrorPosition(coord) {
+        return new Coord(coord.x, (8 - coord.y) + 1);
+    }
+
     /* Espelha o movimento no tabuleiro */
     static mirrorPlay(oldPositionCoord, newPositionCoord) {
-        const mirroredOldPosition = new Coord(
-            oldPositionCoord.x, 
-            (8 - oldPositionCoord.y) + 1
-        );
-
+        const mirroredOldPosition = this.mirrorPosition(oldPositionCoord);
+        
         const yOffset = (oldPositionCoord.y - newPositionCoord.y);
         
         const mirroredNewPosition = new Coord(

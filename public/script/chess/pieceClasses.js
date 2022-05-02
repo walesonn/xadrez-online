@@ -44,13 +44,9 @@ class ChessPiece {
         this.game.state.boardMap.set(newPosition, this);
         this.position = newPosition;
 
-        if (isOpponentMove)
-            /* Se o oponente tiver feito sua
-            jogada, então é sua vez */
-            this.game.state.isMyTurn = true;
-        else
-            /* Passar o turno */
-            this.game.state.isMyTurn = false;
+        /* Se o oponente tiver feito sua jogada, 
+        então é sua vez, se não, passar o turno */
+        this.game.setTurn(isOpponentMove ? true : false);
     }
 
     leaveBoard() {
@@ -71,27 +67,9 @@ class ChessPiece {
 }
 
 class Pawn extends ChessPiece {
-    constructor(game, pieceColor, position) {
+    constructor(game, pieceColor, position, isStartPosition = false) {
         super(game, pieceColor, position);
-        this.startPosition = this.position;
-    }
-
-    moveTo(newPosition, isOpponentMove = false) {
-        super.moveTo(newPosition, isOpponentMove);
-
-        /* Verificando se o peão chegou no final do tabuleiro */
-        let newPosToCoord = BoardCoord.toCoord(newPosition);
-        
-        if (newPosToCoord.y == 1) {
-            // TODO: deixar o jogador escolher a peça que o peão irá se transformar
-            /*
-            let div = document.createElement('div');
-            div.style.backgroundColor = '#000';
-            div.style.width = '200px';
-            div.style.height = '200px';
-            document.querySelector('body').append(div);
-            */
-        }
+        this.startPosition = isStartPosition ? this.position : -1;
     }
 
     /* Função que calcula as possíveis jogadas de acordo com 
@@ -173,6 +151,12 @@ class Pawn extends ChessPiece {
 class Rook extends ChessPiece {
     constructor(game, pieceColor, position) {
         super(game, pieceColor, position);
+        this.alreadyMoved = false;
+    }
+
+    moveTo(newPosition, isOpponentMove = false) {
+        super.moveTo(newPosition, isOpponentMove);
+        this.alreadyMoved = true;
     }
 
     /* Função que calcula as possíveis jogadas de acordo com 
@@ -785,6 +769,12 @@ class Queen extends ChessPiece {
 class King extends ChessPiece {
     constructor(game, pieceColor, position) {
         super(game, pieceColor, position);
+        this.alreadyMoved = false;
+    }
+
+    moveTo(newPosition, isOpponentMove = false) {
+        super.moveTo(newPosition, isOpponentMove);
+        this.alreadyMoved = true;
     }
 
     /* Função que calcula as possíveis jogadas de acordo com 

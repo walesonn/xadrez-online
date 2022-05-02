@@ -7,12 +7,32 @@
     <title>Xadrez Online</title>
 
     <link rel="stylesheet" href="styles/index/index.css">
+    <link rel="stylesheet" href="styles/index/how-works.css">
 </head>
 <body>
+    <div id="how-works-modal" class="modal">
+        <div class="modal-content">
+            <p id="how-works-text">
+                Ao clicar no botão <strong>CRIAR SALA</strong> você será redirecionado para outra página. Copie a URL desta página e mande para seu
+                amigo. Assim que ele entrar, vocês já estarão jogando! Vale ressaltar que o jogador que criou a sala começa com as 
+                peças brancas e, consequentemente, começa jogando.
+                <br><br><strong>MECÂNICAS DO JOGO:</strong><br><br>
+                <strong>-</strong> Quando for o seu turno, a borda do
+                tabuleiro terá um tom verde.<br><br>
+                <strong>-</strong> Você pode clicar ou arrastar as peças para move-las, os quadrados do tabuleiro que ficarem verdes são as posições em que
+                você pode mover sua peça, já os que estiverem vermelhos são as posições em que você pode capturar uma peça adversária.<br><br>
+                <strong>-</strong> Você pode realizar o roque arrastando seu rei para cima da torre que você deseja trocar a posição.
+            </p>
+            <button id="how-works-close">FECHAR</button>
+        </div>
+    </div>
+
     <div class="container">
         <h1 id="header">XADREZ ONLINE</h1>
         <button id="create-room" class="glow-on-hover">CRIAR SALA</button>
     </div>
+
+    <button id="how-works-open">COMO FUNCIONA</button>
 
     <footer>
         <p>Desenvolvido por: 
