@@ -126,7 +126,6 @@ export default class Game {
         /* De acordo com a posição da peça selecionada, pegar a 
         instância dela no Map "boardMap" */
         this.pieceObj = this.state.boardMap.get(this.selectedPiecePosition);
-        console.log(`this.state.boardMap.get(this.selectedPiecePosition): ${this.state.boardMap.get(this.selectedPiecePosition)}`);
 
         /* Pega um array com as posições que essa peça pode andar
         Obs: não leva em conta obstáculos no caminho */
@@ -327,7 +326,42 @@ export default class Game {
     verifyCheck(piecePosition) {
         const pieceObj = this.state.boardMap.get(piecePosition);
 
-        /* Verifica se o oponente deu um xeque no rei */
+        /* Verifica se o peão inimigo deu xeque no rei */
+        if (pieceObj.constructor.name.toLowerCase() == PieceType.Pawn) {
+            let pawnPositionCoord = BoardCoord.toCoord(pieceObj.position);
+            let kingPositionCoord;
+
+            /* Loop pelo boardMap procurando o rei da cor aliada */
+            for (let [positionKey, pieceValue] of this.state.boardMap.entries()) {
+                if (pieceValue != null 
+                    && pieceValue.constructor.name.toLowerCase() == PieceType.King
+                    && pieceValue.pieceColor == this.state.playerColor
+                ) {
+                    kingPositionCoord = BoardCoord.toCoord(positionKey);
+                }
+            }
+
+            /* Se o peão estiver exatamente na linha de cima do rei */
+            const isPawnAboveKing = pawnPositionCoord.y == kingPositionCoord.y - 1;
+
+            /* Se o peão estiver na diagonal esquerda ou direita do rei */
+            const isPawnIsInDiagonal = (pawnPositionCoord.x == kingPositionCoord.x - 1
+                || pawnPositionCoord.x == kingPositionCoord.x + 1)
+
+            if (isPawnAboveKing && isPawnIsInDiagonal) {
+                this.isKingInCheck = true;
+                this.paintCheckIndicatives([piecePosition, kingPositionCoord.toNumber()]);
+                
+                const message = getMessage(MessageType.InCheck);
+                this.messageBox.show(message);
+            }
+
+            return;
+        }
+
+        /* Verifica se o oponente deu um xeque no rei 
+        (essa verificação serve pra todas as peças com excessão
+        do peão, que foi feita acima)*/
         pieceObj
             .getPossibleMoves(piecePosition)
             .attackPositions.forEach(e => {

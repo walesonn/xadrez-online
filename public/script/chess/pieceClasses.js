@@ -76,6 +76,24 @@ class Pawn extends ChessPiece {
         this.startPosition = this.position;
     }
 
+    moveTo(newPosition, isOpponentMove = false) {
+        super.moveTo(newPosition, isOpponentMove);
+
+        /* Verificando se o peão chegou no final do tabuleiro */
+        let newPosToCoord = BoardCoord.toCoord(newPosition);
+        
+        if (newPosToCoord.y == 1) {
+            // TODO: deixar o jogador escolher a peça que o peão irá se transformar
+            /*
+            let div = document.createElement('div');
+            div.style.backgroundColor = '#000';
+            div.style.width = '200px';
+            div.style.height = '200px';
+            document.querySelector('body').append(div);
+            */
+        }
+    }
+
     /* Função que calcula as possíveis jogadas de acordo com 
     a posição atual da peça */
     getPossibleMoves(currentPosition) {

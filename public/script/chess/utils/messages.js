@@ -11,7 +11,7 @@ export function getMessage(messageType, ...replacements) {
         case MessageType.SendLink:
             return `<strong>Bem-vindo!</strong><br>Clique no botão abaixo para copiar o link da sala e o envie para quem você quiser jogar contra.`
         case MessageType.InCheck:
-            return '<strong>Atenção:</strong><br>Você está em xeque!';
+            return '<strong>Atenção:</strong><br>A jogada feita pelo oponente deixou o seu rei em xeque!';
         case MessageType.Winner:
             return `As peças ${replacements[0]} ganharam o jogo!`;
         case MessageType.RoomClosed:

@@ -75,6 +75,8 @@ io.on('connection', socket => {
 		let url = socket.handshake.headers.referer.split('/');
 		let roomId = url[3];
 
+        socket.join(roomId);
+
         let room = null;
 
         /* Verificando se a sala já foi criada */

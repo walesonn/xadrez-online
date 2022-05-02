@@ -35,14 +35,11 @@
 
             const game = new Game();
             const messageBox = initializeMessageBox();
-            
-            /* Cria a UI da mesa */
-            board.render();
 
             /* Configura um observer e inicia o jogo */
             function setup(thisPlayerColor, roomId) {
                 game.subscribe((command) => {
-                    /*Comandos*/
+                    /* Comandos */
                     switch (command.type) {
                         case 'pieceMoved':
                             game.renderPieces(command.thisBoardMap);
@@ -60,10 +57,10 @@
                 });
 
                 const board = createBoard(thisPlayerColor);
-
+                
                 /* Cria a UI da mesa */
                 board.render();
-
+                
                 game.start(board, thisPlayerColor, roomId);
             }
 
