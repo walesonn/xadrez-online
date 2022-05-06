@@ -1,3 +1,5 @@
+![1](https://user-images.githubusercontent.com/62410044/165881465-4df81417-6ee5-4ea3-979d-9685d6a848f5.gif)
+
 # Xadrez Online
 Jogo de xadrez online feito usando a biblioteca Socket.IO
 
@@ -12,5 +14,3 @@ Jogo de xadrez online feito usando a biblioteca Socket.IO
   - <strong>npm run start</strong>
 
 E pronto! Mantenha o terminal aberto e clique <a href="http://localhost:3000">aqui</a> para abrir o projeto.
-
-![1](https://user-images.githubusercontent.com/62410044/165881465-4df81417-6ee5-4ea3-979d-9685d6a848f5.gif)
