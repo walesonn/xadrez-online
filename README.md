@@ -11,6 +11,6 @@ Jogo de xadrez online feito usando a biblioteca Socket.IO
 - Clone a branch main deste repositório para seu computador
 - Abra a pasta do projeto pelo seu terminal e execute os seguintes comandos:
   - <strong>npm install</strong>
-  - <strong>npm run start</strong>
+  - <strong>npm start</strong>
 
 E pronto! Mantenha o terminal aberto e clique <a href="http://localhost:3000">aqui</a> para abrir o projeto.
