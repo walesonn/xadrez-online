@@ -1,75 +1,75 @@
 /* The Modal (background) */
 .modal {
-    display: none;
-    
-    position: fixed;
-    left: 0; top: 0;
-    
-    z-index: 1000;
-    
-    width: 100%;
-    height: 100%;
-    
-    overflow: auto;
-    
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4);
+  display: none;
+  
+  position: fixed;
+  left: 0; top: 0;
+  
+  z-index: 1000;
+  
+  width: 100%;
+  height: 100%;
+  
+  overflow: auto;
+  
+  background-color: rgb(0,0,0);
+  background-color: rgba(0,0,0,0.4);
 }
 
 .modal-content {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
 
-    z-index: 1001;
+  z-index: 1001;
 
-    border-radius: 10px;
+  border-radius: 10px;
 
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 
-    background-color: #fefefe;
-    border: 1px solid #888;
-    
-    margin: auto;
-    padding: 20px 40px;
+  background-color: #fefefe;
+  border: 1px solid #888;
+  
+  margin: auto;
+  padding: 20px 40px;
 
-    width: 800px;
+  width: 800px;
 }
 
 #how-works-close {
-    background-color: #7db5b6;
-    color: #f0f9fc;
+  background-color: #7db5b6;
+  color: #f0f9fc;
 
-    border: 1px solid #000706;
-    border-radius: 15px;
+  border: 1px solid #000706;
+  border-radius: 15px;
 
-    padding: 12px 20px;
-    
-    font-size: 20px;
-    font-weight: bold;
+  padding: 12px 20px;
+  
+  font-size: 20px;
+  font-weight: bold;
 }
 
 #how-works-close:hover,
 #how-works-close:focus {
-    cursor: pointer;
+  cursor: pointer;
 
-    text-decoration: none;
+  text-decoration: none;
 
-    color: white;
-    filter: brightness(108%);
+  color: white;
+  filter: brightness(108%);
 }
 
 #how-works-close:active {
-    filter: brightness(113%);
+  filter: brightness(113%);
 }
 
 #how-works-text {
-    font-family: Arial;
-    font-size: 22px;
-    text-align: justify;
-    
-    overflow-wrap: break-word;
+  font-family: Arial;
+  font-size: 22px;
+  text-align: justify;
+  
+  overflow-wrap: break-word;
 
-    padding: 40px 0px;
+  padding: 40px 0px;
 }

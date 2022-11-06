@@ -1,100 +1,100 @@
 :root {
-    /* --background: #0a0a0f;
-    --darker-square: rgb(201, 201, 201);
-    --lighter-square: rgb(255, 255, 255); */
-    --background: #000706;
-    --darker-square: #7db5b6;
-    --lighter-square: #e0eff2;
+  /* --background: #0a0a0f;
+  --darker-square: rgb(201, 201, 201);
+  --lighter-square: rgb(255, 255, 255); */
+  --background: #000706;
+  --darker-square: #7db5b6;
+  --lighter-square: #e0eff2;
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    min-height: 100vh;
-    background: var(--background);
+  min-height: 100vh;
+  background: var(--background);
 }
 
 #board {
-    position: absolute;
-    
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    
-    top: 50%; left: 50%;
-    transform-origin: center;
-    transform: translate(-50%, -50%);
-    
-    border: 5px solid var(--lighter-square);
-    background-color: var(--darker-square);
+  position: absolute;
+  
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  
+  top: 50%; left: 50%;
+  transform-origin: center;
+  transform: translate(-50%, -50%);
+  
+  border: 5px solid var(--lighter-square);
+  background-color: var(--darker-square);
 
-    height: 610px;
-    width: 610px;
+  height: 610px;
+  width: 610px;
 
-    cursor: pointer;
+  cursor: pointer;
 
-    z-index: 0;
+  z-index: 0;
 }
 
 #board.your-turn {
-    border: 5px solid rgb(128, 255, 82);
+  border: 5px solid rgb(128, 255, 82);
 }
 
 #choose-pawn-transformation {
-    display: none;
-    height: fit-content;
-    width: fit-content;
-    border: 2px solid rgb(227, 160, 102);
-    background-color: rgb(205, 81, 36);
-    
-    padding: 2px;
+  display: none;
+  height: fit-content;
+  width: fit-content;
+  border: 2px solid rgb(227, 160, 102);
+  background-color: rgb(205, 81, 36);
+  
+  padding: 2px;
 
-    position: absolute;
-    left: 50%; top: 50%;
-    
-    z-index: 2;
+  position: absolute;
+  left: 50%; top: 50%;
+  
+  z-index: 2;
 }
 
 #choose-pawn-transformation img {
-    cursor: pointer;
-    border: 2px dashed rgb(227, 160, 102);
-    
-    z-index: 3;
+  cursor: pointer;
+  border: 2px dashed rgb(227, 160, 102);
+  
+  z-index: 3;
 }
 
 #choose-pawn-transformation img:hover {
-    background-color: rgb(227, 107, 63);
+  background-color: rgb(227, 107, 63);
 }
 
 .square {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-    height: 75px;
-    width: 75px;
+  height: 75px;
+  width: 75px;
 }
 
 .square img {
-    user-select: none;
+  user-select: none;
 
-    position: static;
-    top: auto;
-    left: auto;
+  position: static;
+  top: auto;
+  left: auto;
 
-    z-index: 500;
+  z-index: 500;
 
-    height: 60px;
-    width: 60px;
+  height: 60px;
+  width: 60px;
 }
 
 .square.black {
-    background: var(--darker-square);
+  background: var(--darker-square);
 }
 
 .square.white {
-    background: var(--lighter-square);
+  background: var(--lighter-square);
 }

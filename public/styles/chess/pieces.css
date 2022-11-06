@@ -1,51 +1,51 @@
 /* Peças brancas */
 
 .white.rook {
-    content: url(../../img/white_rook.png);
+  content: url(/image/white_rook.png);
 }
 
 .white.horse {
-    content: url(../../img/white_horse.png);
+  content: url(/image/white_horse.png);
 }
 
 .white.bishop {
-    content: url(../../img/white_bishop.png);
+  content: url(/image/white_bishop.png);
 }
 
 .white.queen {
-    content: url(../../img/white_queen.png);
+  content: url(/image/white_queen.png);
 }
 
 .white.king {
-    content: url(../../img/white_king.png);
+  content: url(/image/white_king.png);
 }
 
 .white.pawn {
-    content: url(../../img/white_pawn.png);
+  content: url(/image/white_pawn.png);
 }
 
 /* Peças pretas */
 
 .dark.rook {
-    content: url(../../img/dark_rook.png);
+  content: url(/image/dark_rook.png);
 }
 
 .dark.horse {
-    content: url(../../img/dark_horse.png);
+  content: url(/image/dark_horse.png);
 }
 
 .dark.bishop {
-    content: url(../../img/dark_bishop.png);
+  content: url(/image/dark_bishop.png);
 }
 
 .dark.queen {
-    content: url(../../img/dark_queen.png);
+  content: url(/image/dark_queen.png);
 }
 
 .dark.king {
-    content: url(../../img/dark_king.png);
+  content: url(/image/dark_king.png);
 }
 
 .dark.pawn {
-    content: url(../../img/dark_pawn.png);
+  content: url(/image/dark_pawn.png);
 }

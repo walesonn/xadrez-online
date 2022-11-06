@@ -7,18 +7,18 @@ const howWorksOpenBtn = document.querySelector('#how-works-open');
 const howWorksCloseBtn = document.querySelector('#how-works-close');
 
 createRoomBtn.addEventListener('click', () => {
-    socket.emit('createRoom', socket.id);
+  socket.emit('createRoom', socket.id);
 });
 
 howWorksOpenBtn.addEventListener('click', () => {
-    howWorksModal.style.display = 'block';
+  howWorksModal.style.display = 'block';
 });
 
 howWorksCloseBtn.addEventListener('click', () => {
-    howWorksModal.style.display = 'none';
+  howWorksModal.style.display = 'none';
 });
 
 socket.on('roomCreated', (href, roomId) => {
-    document.location.href = href;
-    localStorage.setItem('room-id', roomId);
+  document.location.href = href;
+  localStorage.setItem('room-id', roomId);
 });

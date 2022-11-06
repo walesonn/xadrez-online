@@ -1,172 +1,175 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="./img/ico.png" type="image/x-icon">
-    <title>Xadrez Online</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="shortcut icon" href="./img/ico.png" type="image/x-icon">
+	<title>Xadrez Online</title>
 
-    <link rel="stylesheet" href="styles/chess/chess.css">
-    <link rel="stylesheet" href="styles/chess/message-box.css">
-    <link rel="stylesheet" href="styles/chess/pieces.css">
-    <script src="/socket.io/socket.io.js"></script>
+	<link rel="stylesheet" href="styles/chess/chess.css">
+	<link rel="stylesheet" href="styles/chess/message-box.css">
+	<link rel="stylesheet" href="styles/chess/pieces.css">
+	<script src="/socket.io/socket.io.js"></script>
 </head>
+
 <body>
-    <div id="board"></div>
+	<div id="board"></div>
 
-    <div id="message-box-modal" class="modal">
-        <div class="modal-content">
-            <p id="message"></p>
-            <button id="message-box-copy">COPIAR LINK</button>
-            <button id="message-box-close">FECHAR</button>
-        </div>
-    </div>
+	<div id="message-box-modal" class="modal">
+		<div class="modal-content">
+			<p id="message"></p>
+			<button id="message-box-copy">COPIAR LINK</button>
+			<button id="message-box-close">FECHAR</button>
+		</div>
+	</div>
 
-    <div id="choose-pawn-transformation">
-        <img class="choice chess-piece rook">
-        <img class="choice chess-piece horse">
-        <img class="choice chess-piece bishop">
-        <img class="choice chess-piece queen">
-    </div>
-    
-    <script type="module">
-        import {
-            PieceType, 
-            PieceColor,
-            Queen,
-            Rook,
-            Horse,
-            Bishop
-        } from './script/chess/pieceClasses.js';
-        
-        import { MessageType, getMessage } from './script/chess/utils/messages.js';
-        import initializeMessageBox from './script/chess/message-box.js'
-        import createBoard from './script/chess/utils/createBoard.js';
-        import Game from './script/chess/game.js';
+	<div id="choose-pawn-transformation">
+		<img class="choice chess-piece rook">
+		<img class="choice chess-piece horse">
+		<img class="choice chess-piece bishop">
+		<img class="choice chess-piece queen">
+	</div>
 
-        window.addEventListener('load', (event) => {
+	<script type="module">
+		import {
+			PieceType,
+			PieceColor,
+			Queen,
+			Rook,
+			Horse,
+			Bishop
+		} from './script/chess/pieceClasses.js';
 
-            const socket = io();
+		import { MessageType, getMessage } from './script/chess/utils/messages.js';
+		import initializeMessageBox from './script/chess/message-box.js'
+		import createBoard from './script/chess/utils/createBoard.js';
+		import Game from './script/chess/game.js';
 
-            const game = new Game();
-            const messageBox = initializeMessageBox();
+		window.addEventListener('load', (event) => {
 
-            /* Configura um observer e inicia o jogo */
-            function setup(thisPlayerColor, roomId) {
-                game.subscribe((command) => {
-                    /* Comandos */
-                    switch (command.type) {
-                        case 'pieceMoved':
-                            game.renderPieces(command.thisBoardMap);
-                            socket.emit(
-                                command.type, 
-                                command.mirroredOldPosition, 
-                                command.mirroredNewPosition, 
-                                roomId);
-                            break;
-                    }
+			const socket = io();
 
-                    /* Enviando o comando que o jogador executou ao server */
-                    /*console.log(`> Emitting event -> ${command.type}`);*/
-                    socket.emit(command.type, command);
-                });
+			const game = new Game();
+			const messageBox = initializeMessageBox();
 
-                const board = createBoard(thisPlayerColor);
-                
-                /* Cria a UI da mesa */
-                board.render();
-                
-                game.start(board, thisPlayerColor, roomId);
-            }
+			/* Configura um observer e inicia o jogo */
+			function setup(thisPlayerColor, roomId) {
+				game.subscribe((command) => {
+					/* Comandos */
+					switch (command.type) {
+						case 'pieceMoved':
+							game.renderPieces(command.thisBoardMap);
+							socket.emit(
+								command.type,
+								command.mirroredOldPosition,
+								command.mirroredNewPosition,
+								roomId
+							);
+						break;
+					}
 
-            /* Mensagens recebidas do servidor */
+					/*console.log(`> Emitting event -> ${command.type}`);*/
+					/* Enviando o comando que o jogador executou ao server */
+					socket.emit(command.type, command);
+				});
 
-            socket.on('connect', () => {
-                socket.emit('enteredRoom');
-            });
+				const board = createBoard(thisPlayerColor);
 
-            socket.on('showSendLinkMessage', () => {
-                /* Exibe uma mensagem de boas-vindas e
-                um botão para copiar o link da sala */
-                const message = getMessage(MessageType.SendLink);
-                messageBox.show(message, true);
-            });
+				/* Cria a UI da mesa */
+				board.render();
+				game.start(board, thisPlayerColor, roomId);
+			}
 
-            socket.on('startGame', (room, homeUrl) => {
-                /*console.log(`> "startGame" received from server`);*/
+			/* Mensagens recebidas do servidor */
 
-                if (room.isClosed) {
-                    const message = getMessage(MessageType.RoomClosed);
-                    messageBox.show(message);
-                    messageBox.loadPageOnClose(homeUrl);
-                    
-                    return;
-                }
+			socket.on('connect', () => {
+				socket.emit('enteredRoom');
+			});
 
-                switch (socket.id) {
-                    case room.whiteId:
-                        setup(PieceColor.White, room.id);
-                        break;
-                    case room.darkId:
-                        setup(PieceColor.Dark, room.id);
-                        break;
-                }
-            });
+			socket.on('showSendLinkMessage', () => {
+				/* Exibe uma mensagem de boas-vindas e
+				um botão para copiar o link da sala */
+				const message = getMessage(MessageType.SendLink);
+				messageBox.show(message, true);
+			});
 
-            socket.on('playerDisconnected', homeUrl => {
-                const message = getMessage(MessageType.PlayerDisconnected);
-                messageBox.show(message);
-                messageBox.loadPageOnClose(homeUrl);
-            });
+			socket.on('startGame', (room, homeUrl) => {
+				/*console.log(`> "startGame" received from server`);*/
 
-            socket.on('pieceMoved', (oldPosition, newPosition) => {
-                /*console.log('> "pieceMoved" received from server (rendering mirrored play)');*/
-                game.receiveOpponentPlay(oldPosition, newPosition)
-            });
+				if (room.isClosed) {
+					const message = getMessage(MessageType.RoomClosed);
+					messageBox.show(message);
+					messageBox.loadPageOnClose(homeUrl);
 
-            socket.on('pawnTransformed', command => {
-                /*console.log('> "pawnTransformed" received from server');*/
-                const { pawnPosition, pieceColor, transformType } = command;
-                let transformObject;
+					return;
+				}
 
-                switch (transformType) {
-                    case PieceType.Queen:
-                        transformObject = new Queen(
-                            game,
-                            pieceColor,
-                            pawnPosition)
-                        break;
-                    case PieceType.Rook:
-                        transformObject = new Rook(
-                            game,
-                            pieceColor,
-                            pawnPosition)
-                        break;
-                    case PieceType.Horse:
-                        transformObject = new Horse(
-                            game,
-                            pieceColor,
-                            pawnPosition)
-                        break;
-                    case PieceType.Bishop:
-                        transformObject = new Bishop(
-                            game,
-                            pieceColor,
-                            pawnPosition)
-                        break;
-                }
+				switch (socket.id) {
+					case room.whiteId:
+						setup(PieceColor.White, room.id);
+						break;
+					case room.darkId:
+						setup(PieceColor.Dark, room.id);
+						break;
+				}
+			});
 
-                game.state.boardMap.set(
-                    pawnPosition,
-                    transformObject
-                );
+			socket.on('playerDisconnected', homeUrl => {
+				const message = getMessage(MessageType.PlayerDisconnected);
+				messageBox.show(message);
+				messageBox.loadPageOnClose(homeUrl);
+			});
 
-                document.getElementById(`square${pawnPosition}`)
-                    .firstChild
-                    .classList
-                    .replace(PieceType.Pawn, transformType);
-            });
-        });
-    </script>
+			socket.on('pieceMoved', (oldPosition, newPosition) => {
+				/*console.log('> "pieceMoved" received from server (rendering mirrored play)');*/
+				game.receiveOpponentPlay(oldPosition, newPosition)
+			});
+
+			socket.on('pawnTransformed', command => {
+				/*console.log('> "pawnTransformed" received from server');*/
+				const { pawnPosition, pieceColor, transformType } = command;
+				let transformObject;
+
+				switch (transformType) {
+					case PieceType.Queen:
+						transformObject = new Queen(
+							game,
+							pieceColor,
+							pawnPosition)
+						break;
+					case PieceType.Rook:
+						transformObject = new Rook(
+							game,
+							pieceColor,
+							pawnPosition)
+						break;
+					case PieceType.Horse:
+						transformObject = new Horse(
+							game,
+							pieceColor,
+							pawnPosition)
+						break;
+					case PieceType.Bishop:
+						transformObject = new Bishop(
+							game,
+							pieceColor,
+							pawnPosition)
+						break;
+				}
+
+				game.state.boardMap.set(
+					pawnPosition,
+					transformObject
+				);
+
+				document.getElementById(`square${pawnPosition}`)
+					.firstChild
+					.classList
+					.replace(PieceType.Pawn, transformType);
+			});
+		});
+	</script>
 </body>
+
 </html>
