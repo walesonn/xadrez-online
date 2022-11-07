@@ -136,7 +136,7 @@ footer {
   font-size: 18px;
 }
 
-footer p a {
+footer span a {
   color: var(--background);
 }
 
