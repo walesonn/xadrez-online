@@ -138,6 +138,22 @@ io.on('connection', socket => {
   socket.on('gameEnded', command => {
     closeRoom(command.roomId);
   });
+
+  /* sinalização para troca de fluxo de audio entre jogadores */
+  socket.on("offer", (offer, to)=>{
+    console.log("[offer]",to)
+    socket.to(to).emit("offer", offer)
+  });
+
+  socket.on("answer", (answer, to) =>{
+    console.log("[answer]", to)
+    socket.to(to).emit("answer", answer);
+  })
+
+  socket.on("ice", (ice, to) =>{
+    console.log("[ice]", to)
+    socket.to(to).emit("ice", ice);
+  })
 });
 
 server.listen(port, () => {

@@ -45,6 +45,8 @@
 		import initializeMessageBox from './script/chess/message-box.js'
 		import createBoard from './script/chess/utils/createBoard.js';
 		import Game from './script/chess/game.js';
+		import createOffer from "./script/chess/webrtc/createOffer.js"
+		import createAnswer from "./script/chess/webrtc/createOffer.js"
 
 		window.addEventListener('load', (event) => {
 
@@ -94,9 +96,8 @@
 				messageBox.show(message, true);
 			});
 
-			socket.on('startGame', (room, homeUrl) => {
+			socket.on('startGame', async (room, homeUrl) => {
 				/*console.log(`> "startGame" received from server`);*/
-
 				if (room.isClosed) {
 					const message = getMessage(MessageType.RoomClosed);
 					messageBox.show(message);
@@ -108,9 +109,13 @@
 				switch (socket.id) {
 					case room.whiteId:
 						setup(PieceColor.White, room.id);
+						await createOffer(socket, room.darkId);
 						break;
 					case room.darkId:
 						setup(PieceColor.Dark, room.id);
+						socket.once("offer", async offer=>{
+							await createAnswer(socket, offer,room.whiteId);
+						})
 						break;
 				}
 			});
