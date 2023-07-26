@@ -8,7 +8,7 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 const host = 'localhost';
-const port = 3000;
+const port = process.env.PORT||3000;
 
 /* Array que armazena objetos que representam uma 
 sala de jogo criada */
