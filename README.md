@@ -20,4 +20,4 @@ E pronto! Mantenha o terminal aberto e clique <a href="http://localhost:3000">aq
 
 #### ATENÇÃO
 - É de extrema importância e para bom funcionamento da comunicação de audio entre os dois players de que esta aplicação seja configurada em um endpoint https://<domain here> pois por segurança o google bloqueia a transmissão de audio entre endpoints não seguros, ou seja, http://.
-```Para testar aplicação em ambiente de desenvolvimento ou seja http://localhost a comunicação funciona normalmente porém se usar http://<ip da maquina> ocorrerá o problema de mal funcionamento.```
+```Para testar aplicação em ambiente de desenvolvimento ou seja http://localhost a comunicação funciona normalmente porém se usar http://<ip da maquina> ocorrerá o problema de bloqueio.```
