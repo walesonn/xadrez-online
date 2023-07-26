@@ -45,16 +45,15 @@
 		import initializeMessageBox from './script/chess/message-box.js'
 		import createBoard from './script/chess/utils/createBoard.js';
 		import Game from './script/chess/game.js';
-		import createOffer from "./script/chess/webrtc/createOffer.js"
-		import createAnswer from "./script/chess/webrtc/createOffer.js"
+		import setRemoteStream from "./script/chess/webrtc/setRemoteStream.js";
 
-		window.addEventListener('load', (event) => {
+		window.addEventListener('load', async (event) => {
 
 			const socket = io();
 
 			const game = new Game();
 			const messageBox = initializeMessageBox();
-
+			
 			/* Configura um observer e inicia o jogo */
 			function setup(thisPlayerColor, roomId) {
 				game.subscribe((command) => {
@@ -94,27 +93,71 @@
 				um botão para copiar o link da sala */
 				const message = getMessage(MessageType.SendLink);
 				messageBox.show(message, true);
-			});
-
+			});			
+			
 			socket.on('startGame', async (room, homeUrl) => {
 				/*console.log(`> "startGame" received from server`);*/
 				if (room.isClosed) {
 					const message = getMessage(MessageType.RoomClosed);
 					messageBox.show(message);
 					messageBox.loadPageOnClose(homeUrl);
-
 					return;
 				}
+
+				const stream = await navigator.mediaDevices.getUserMedia({audio: true, video: false})
+			
+				const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]}
+				const peerConnection = new RTCPeerConnection(configuration);
+            
+				socket.on('ice', async (ice)=>{
+					await peerConnection.addIceCandidate(ice)
+				});
+
+				stream.getTracks().forEach(async track=>{
+					peerConnection.addTrack(track, stream)
+				})
+                        
+				peerConnection.addEventListener('connectionstatechange', event => {
+					if (peerConnection.connectionState === 'connected') {
+						// Peers connected!
+						console.log("Peer connected")
+					}
+				});
+			
+				peerConnection.addEventListener("track", (event)=>{
+					const [remoteStream] = event.streams;
+					setRemoteStream(remoteStream)
+				})
+
+				socket.on('offer', async (offer)=>{
+					await peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
+					const answer = await peerConnection.createAnswer()
+					await peerConnection.setLocalDescription(new RTCSessionDescription(answer));
+					socket.emit('answer', answer, room.whiteId)
+				});
+
+				socket.on('answer', async (answer)=>{
+					await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
+				})
 
 				switch (socket.id) {
 					case room.whiteId:
 						setup(PieceColor.White, room.id);
-						await createOffer(socket, room.darkId);
+						peerConnection.addEventListener("icecandidate",(event)=>{
+							if(event.candidate){
+								socket.emit("ice", event.candidate,room.darkId)
+							}
+						})
+						const offer = await peerConnection.createOffer()
+						await peerConnection.setLocalDescription(new RTCSessionDescription(offer))
+						socket.emit('offer', offer, room.darkId)
 						break;
 					case room.darkId:
 						setup(PieceColor.Dark, room.id);
-						socket.once("offer", async offer=>{
-							await createAnswer(socket, offer,room.whiteId);
+						peerConnection.addEventListener("icecandidate",(event)=>{
+							if(event.candidate){
+								socket.emit("ice", event.candidate,room.whiteId)
+							}
 						})
 						break;
 				}

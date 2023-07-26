@@ -1,8 +1,5 @@
-export function setRemoteStream(stream){
-    let audio = document.getElementsByTagName("audio")[0]
-    if(!audio){
-        audio = document.createElement("audio");
-    }
+export default function setRemoteStream(stream){
+    const audio = document.createElement("audio");
     audio.srcObject = stream;
     audio.autoplay = true;
     audio.volume = 1;
