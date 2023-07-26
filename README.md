@@ -14,3 +14,6 @@ Jogo de xadrez online feito usando a biblioteca Socket.IO
   - <strong>npm start</strong>
 
 E pronto! Mantenha o terminal aberto e clique <a href="http://localhost:3000">aqui</a> para abrir o projeto.
+
+### FLUXO DE AUDIO ENTRE OS DOIS JOGADORES
+- Os jogadores podem se comunicar em tempo real durante a partida, para isso se faz necessário algum dispositivo que capte audio, como headsets ou fone de ouvido, plugados na máquina dos jogadores.
