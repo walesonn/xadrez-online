@@ -17,3 +17,6 @@ E pronto! Mantenha o terminal aberto e clique <a href="http://localhost:3000">aq
 
 ### FLUXO DE AUDIO ENTRE OS DOIS JOGADORES
 - Os jogadores podem se comunicar em tempo real durante a partida, para isso se faz necessário algum dispositivo que capte audio, como headsets ou fone de ouvido, plugados na máquina dos jogadores.
+
+#### ATENÇÃO
+- É de extrema importância e para bom funcionamento da comunicação de audio entre os dois players de que esta aplicação seja configurada em um endpoint https://<domain here> pois por segurança o google bloqueia a transmissão de audio entre endpoints não seguros, ou seja, http://.
