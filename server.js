@@ -8,7 +8,7 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 const host = 'localhost';
-const port = process.env.PORT||3000;
+const port = process.env.PORT || 3000;
 
 /* Array que armazena objetos que representam uma 
 sala de jogo criada */
@@ -45,8 +45,7 @@ function closeRoom(roomId) {
 io.on('connection', socket => {
   const url = socket.handshake.headers.referer.split('/');
   const roomId = url[3];
-  const inGameRoom = (roomId != undefined && roomId.length == 30)
-
+  const inGameRoom = (roomId != undefined && roomId.length == 6)
   if (inGameRoom)
     console.log(`> Jogador [${socket.id}] conectado na sala [${roomId}]`);
 
@@ -140,15 +139,15 @@ io.on('connection', socket => {
   });
 
   /* sinalização para troca de fluxo de audio entre jogadores */
-  socket.on("offer", (offer, to)=>{
+  socket.on("offer", (offer, to) => {
     socket.to(to).emit("offer", offer)
   });
 
-  socket.on("answer", (answer, to) =>{
+  socket.on("answer", (answer, to) => {
     socket.to(to).emit("answer", answer);
   })
 
-  socket.on("ice", (ice, to) =>{
+  socket.on("ice", (ice, to) => {
     socket.to(to).emit("ice", ice);
   })
 });

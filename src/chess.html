@@ -53,7 +53,7 @@
 
 			const game = new Game();
 			const messageBox = initializeMessageBox();
-			
+
 			/* Configura um observer e inicia o jogo */
 			function setup(thisPlayerColor, roomId) {
 				game.subscribe((command) => {
@@ -67,7 +67,7 @@
 								command.mirroredNewPosition,
 								roomId
 							);
-						break;
+							break;
 					}
 
 					/*console.log(`> Emitting event -> ${command.type}`);*/
@@ -93,8 +93,8 @@
 				um botão para copiar o link da sala */
 				const message = getMessage(MessageType.SendLink);
 				messageBox.show(message, true);
-			});			
-			
+			});
+
 			socket.on('startGame', async (room, homeUrl) => {
 				/*console.log(`> "startGame" received from server`);*/
 				if (room.isClosed) {
@@ -104,48 +104,48 @@
 					return;
 				}
 
-				const stream = await navigator.mediaDevices.getUserMedia({audio: true, video: false})
-			
-				const configuration = {'iceServers': [{'urls': 'stun:stun.l.google.com:19302'}]}
+				const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+
+				const configuration = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] }
 				const peerConnection = new RTCPeerConnection(configuration);
-            
-				socket.on('ice', async (ice)=>{
+
+				socket.on('ice', async (ice) => {
 					await peerConnection.addIceCandidate(ice)
 				});
 
-				stream.getTracks().forEach(async track=>{
+				stream.getTracks().forEach(async track => {
 					peerConnection.addTrack(track, stream)
 				})
-                        
+
 				peerConnection.addEventListener('connectionstatechange', event => {
 					if (peerConnection.connectionState === 'connected') {
 						// Peers connected!
 						console.log("Peer connected")
 					}
 				});
-			
-				peerConnection.addEventListener("track", (event)=>{
+
+				peerConnection.addEventListener("track", (event) => {
 					const [remoteStream] = event.streams;
 					setRemoteStream(remoteStream)
 				})
 
-				socket.on('offer', async (offer)=>{
+				socket.on('offer', async (offer) => {
 					await peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
 					const answer = await peerConnection.createAnswer()
 					await peerConnection.setLocalDescription(new RTCSessionDescription(answer));
 					socket.emit('answer', answer, room.whiteId)
 				});
 
-				socket.on('answer', async (answer)=>{
+				socket.on('answer', async (answer) => {
 					await peerConnection.setRemoteDescription(new RTCSessionDescription(answer));
 				})
 
 				switch (socket.id) {
 					case room.whiteId:
 						setup(PieceColor.White, room.id);
-						peerConnection.addEventListener("icecandidate",(event)=>{
-							if(event.candidate){
-								socket.emit("ice", event.candidate,room.darkId)
+						peerConnection.addEventListener("icecandidate", (event) => {
+							if (event.candidate) {
+								socket.emit("ice", event.candidate, room.darkId)
 							}
 						})
 						const offer = await peerConnection.createOffer()
@@ -154,9 +154,9 @@
 						break;
 					case room.darkId:
 						setup(PieceColor.Dark, room.id);
-						peerConnection.addEventListener("icecandidate",(event)=>{
-							if(event.candidate){
-								socket.emit("ice", event.candidate,room.whiteId)
+						peerConnection.addEventListener("icecandidate", (event) => {
+							if (event.candidate) {
+								socket.emit("ice", event.candidate, room.whiteId)
 							}
 						})
 						break;
